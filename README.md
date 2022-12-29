@@ -16,17 +16,17 @@ Student
 2. GPS To Do.  
 3. Motor To Do.  
 
-## Camera & LiDAR To Do.  
+## 1. Camera & LiDAR To Do.  
 1. Make Camera & LiDAR module.  
 2. Test module with obstacles. (White cylinder)  
 3. Modify Camera & LiDAR module.  
 
-## GPS To Do.  
+## 2. GPS To Do.  
 1. Make GPS module.  
 2. Test module.  
 3. Calibrate GPS module.  
 
-## Motor To Do.  
+## 3. Motor To Do.  
 1. Combine Camera & LiDAR module and GPS module.  
 2. Test code while mounted on the ship.  
 3. Make and calibrate Motor module while running the motor.  
