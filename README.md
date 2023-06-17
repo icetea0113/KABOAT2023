@@ -49,8 +49,7 @@
 4. [라이선스](#라이선스)
 
 ## 참가 인원
-### Pusan Nat'l Univ. NAOE
-<br>
+### Pusan Nat'l Univ. NAOE<br>
 
 #### Professor. Yoon Ho Shin.  (ISV lab.)
 #### Student
@@ -58,14 +57,11 @@
 - Hee Geun Lee (Team Leader)
 - Yoo Jin Lee
 - Ji Min Seo
-- Dong Hyun Yang
-- 
-<br>
-<br>
+- Dong Hyun Yang<br>
 
 #### Assistant
-- Yeong Woo Do (CEO of Wavymon)
-
+- Yeong Woo Do (CEO of Wavymon)<br>
+  
 ## 관련 문서  
 ### Documents
 📋 상세 개발 보고서: 알고리즘 설계 및 구현, 테스트에 대한 내용을 상세하게 서술하였음. 추후 추가할 예정.<br>
