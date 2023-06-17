@@ -55,7 +55,7 @@
 #### Student
 - Sung Min Um  
 - Hee Geun Lee (Team Leader)
-- Yoo Jin Lee
+- Yu Jin Lee
 - Ji Min Seo
 - Dong Hyun Yang
 
