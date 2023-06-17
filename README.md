@@ -40,8 +40,8 @@
 4. [라이선스](#라이선스)
 
 ## 참가 인원
-##### Pusan Nat'l Univ. NAOE
-Professor. Yoon Ho Shin.  
+#### Pusan Nat'l Univ. NAOE
+Professor. Yoon Ho Shin.  (ISV lab.)
 Student
 - Sung Min Um  
 - Hee Geun Lee (Team Leader)
