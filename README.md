@@ -17,9 +17,9 @@ Assistant
 
 <div align="center">
 	<img src="https://img.shields.io/badge/ROS2-22314E?style=flat&logo=ROS&logoColor=white" />
-	<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=Noion&logoColor=white" />
+	<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=Notion&logoColor=white" />
 	<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat&logo=VisualStudioCode&logoColor=white" />
-	
+	<br>
 	<img src="https://img.shields.io/badge/Github-181717?style=flat&logo=Github&logoColor=white" />
 </div>
 
