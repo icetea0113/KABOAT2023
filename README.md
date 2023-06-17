@@ -16,12 +16,9 @@ Assistant
 
 
 <div align="center">
-	Tech Stack \n
-	Tools\n
-	
 	<img src="https://img.shields.io/badge/ROS2-22314E?style=flat&logo=ROS&logoColor=white" />
-	<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=HTML5&logoColor=white" />
-	<img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=CSS3&logoColor=white" />
+	<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=Noion&logoColor=white" />
+	<img src="https://img.shields.io/badge/VisualStudioCode-007ACC?style=flat&logo=VisualStudioCode&logoColor=white" />
 </div>
 
 ![img](https://user-images.githubusercontent.com/48307403/209555944-2a6f903b-1f4b-4c03-bb3e-2cea64d69935.png)  
