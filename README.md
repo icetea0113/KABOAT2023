@@ -53,11 +53,11 @@
 
 #### Professor. Yoon Ho Shin.  (ISV lab.)
 #### Student
-- Sung Min Um  
+- Sung Min Um
+- Dong Heon Yang
 - Hee Geun Lee (Team Leader)
 - Yu Jin Lee
 - Ji Min Seo
-- Dong Hyun Yang
 
 #### Assistant
 - Yeong Woo Do (CEO of Wavymon)<br>
