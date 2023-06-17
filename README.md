@@ -2,7 +2,7 @@
 
 ```
 이 레포지토리는 KABOAT 2023에 일반인 소속으로 참가하는 IdH 팀의 임무 수행을 위한 ROS2 패키지 및 소스코드 등을 포함하고 있다.
-````
+```
 
 ------
 <div align=center>
@@ -28,9 +28,11 @@
 	<img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=Slack&logoColor=white" />
 </div>
 <br><br>
+
 ```
 Notion Link를 누르시면 저희가 사용하고 있는 Notion에 들어갈 수 있습니다.
 ```
+
 <div align = center>
  
 ![img](https://user-images.githubusercontent.com/48307403/209555944-2a6f903b-1f4b-4c03-bb3e-2cea64d69935.png)  
