@@ -29,9 +29,9 @@
 </div>
 <br><br>
 
-```
-Notion Link를 누르시면 저희가 사용하고 있는 Notion에 들어갈 수 있습니다.
-```
+
+> Notion Link를 누르시면 저희가 사용하고 있는 Notion에 들어갈 수 있습니다.
+
 
 <div align = center>
  
