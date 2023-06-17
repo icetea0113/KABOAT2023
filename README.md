@@ -1,4 +1,4 @@
-# 🛥️ Autonomous Boat : KABOAT2023, Team IdH 
+# 🛥️ Autonomous Boat : KABOAT2023,    Team IdH 
 
 ```
 이 레포지토리는 KABOAT 2023에 일반인 소속으로 참가하는 IdH 팀의 임무 수행을 위한 ROS2 패키지 및 소스코드 등을 포함하고 있다.
