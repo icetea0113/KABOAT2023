@@ -1,20 +1,8 @@
 # 🛥️ Autonomous Boat : KABOAT2023, Team IdH 
 
-Pusan Nat'l Univ. NAOE
-Professor. Yoon Ho Shin.  
-Student
-- Sung Min Um  
-- Hee Geun Lee (Team Leader)
-- Yoo Jin Lee
-- Ji Min Seo
-- Dong Hyun Yang
-
-Assistant
-- Yeong Woo Do (CEO of Wavymon)
-
-'''
+```
 이 레포지토리는 KABOAT 2023에 일반인 소속으로 참가하는 IdH 팀의 임무 수행을 위한 ROS2 패키지 및 소스코드 등을 포함하고 있다.
-'''
+````
 
 ------
 <div align=center>
@@ -46,9 +34,23 @@ Assistant
 -------------------------------------------------------------------------  
 
 ## Contents.  
-1. [관련 문서](#관련 문서)
-2. [코드 구조 및 내용](#코드 구조 및 내용)
-3. [라이선스](#라이선스)
+1. [참가 인원](#참가-인원)
+2. [관련 문서](#관련-문서)
+3. [코드 구조 및 내용](#코드-구조-및-내용)
+4. [라이선스](#라이선스)
+
+## 참가 인원
+##### Pusan Nat'l Univ. NAOE
+Professor. Yoon Ho Shin.  
+Student
+- Sung Min Um  
+- Hee Geun Lee (Team Leader)
+- Yoo Jin Lee
+- Ji Min Seo
+- Dong Hyun Yang
+
+Assistant
+- Yeong Woo Do (CEO of Wavymon)
 
 ## 관련 문서  
 ### Documents
