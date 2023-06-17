@@ -40,16 +40,16 @@
 4. [라이선스](#라이선스)
 
 ## 참가 인원
-#### Pusan Nat'l Univ. NAOE
-Professor. Yoon Ho Shin.  (ISV lab.)
-Student
+### Pusan Nat'l Univ. NAOE
+#### Professor. Yoon Ho Shin.  (ISV lab.)
+#### Student
 - Sung Min Um  
 - Hee Geun Lee (Team Leader)
 - Yoo Jin Lee
 - Ji Min Seo
 - Dong Hyun Yang
 
-Assistant
+#### Assistant
 - Yeong Woo Do (CEO of Wavymon)
 
 ## 관련 문서  
