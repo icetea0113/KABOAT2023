@@ -14,9 +14,10 @@ Assistant
 
 이 레포지토리는 KABOAT 2023에 일반인 소속으로 참가하는 IdH 팀의 임무 수행을 위한 ROS2 패키지 및 소스코드 등을 포함하고 있다.
 
-Tech Stack
-Tools
+
 <div align="center">
+	Tech Stack
+Tools
 	<img src="https://img.shields.io/badge/ROS2-22314E?style=flat&logo=ROS&logoColor=white" />
 	<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=HTML5&logoColor=white" />
 	<img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=CSS3&logoColor=white" />
