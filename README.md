@@ -51,6 +51,7 @@
 ## 참가 인원
 ### Pusan Nat'l Univ. NAOE
 <br>
+
 #### Professor. Yoon Ho Shin.  (ISV lab.)
 #### Student
 - Sung Min Um  
@@ -58,8 +59,10 @@
 - Yoo Jin Lee
 - Ji Min Seo
 - Dong Hyun Yang
+- 
 <br>
 <br>
+
 #### Assistant
 - Yeong Woo Do (CEO of Wavymon)
 
