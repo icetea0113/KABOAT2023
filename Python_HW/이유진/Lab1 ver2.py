@@ -5,8 +5,8 @@ side = list(map(int, input().split(',')))
 max_v = max(side)
 
 side.remove(max_v)
-
 nomax = side
+# side = nomax 사용 이유.
 
 if (sum(nomax)-max_v) > 0:
     print("True")

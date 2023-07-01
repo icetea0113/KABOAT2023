@@ -19,6 +19,7 @@ for i in range(0, len(poly2_terms), 2):
     coefficient = int(poly2_terms[i + 1])
     poly2_degrees.append(degree)
     poly2_coefficients.append(coefficient)
+# 윗 부분을 함수로 만드는게 어떤가.
 
 result_de = []
 ye_deg = poly1_degrees[0] + poly2_degrees[0]

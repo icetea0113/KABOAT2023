@@ -4,11 +4,6 @@ def repeat(a,b, w):
 
     print(s1)
 
-
-
-
-
-
 h = int(input())
 w = int(input())
 while(h>0):

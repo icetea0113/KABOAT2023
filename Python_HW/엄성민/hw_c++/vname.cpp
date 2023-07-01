@@ -35,7 +35,7 @@ int main() {
 
 
     bool b_trivi = false;
-    cout << "¹®ÀåÀ» ÀÔ·ÂÇÏ¼¼¿ä"<<endl;
+    cout << "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½"<<endl;
     getline(cin,input);
     vector<string> words;
     //cout << input<<endl;
@@ -48,9 +48,12 @@ int main() {
 
     string word_list2[5] = { "bool","int","float","complex","list" };
     string word_list3[5] = { "b","i","fp","cplx","ls" };
-    //´ë¹®ÀÚ Á¢±Ù, a, the ¾ø¾Ö±â ÀüÄ¡»ç ¾ø¾Ö±â, Á¦ÀÏ ¾Õ¿¡ ÀÖ´Â°Å ¼öÁ¤
+
+    // mapì„ ì‚¬ìš©í•˜ëŠ”ê²Œ ë” ì¢‹ì§€ ì•Šì•˜ë‚˜ ìƒê°.
+    
+    //ï¿½ë¹®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, a, the ï¿½ï¿½ï¿½Ö±ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½Ö±ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½Õ¿ï¿½ ï¿½Ö´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½
     int word_size = words.size();
-    //´ë¹®ÀÚ ¼Ò¹®ÀÚ·Î
+    //ï¿½ë¹®ï¿½ï¿½ ï¿½Ò¹ï¿½ï¿½Ú·ï¿½
     for (int i = 0; i < word_size; i++) {
         words[i] = toLowerCase(words[i]);
         if (containCase(words[i])) {

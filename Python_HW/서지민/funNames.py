@@ -20,7 +20,6 @@ i = 1
 while i <= len(words)-1:
     word = list(words[i].lower())
     word[0] = word[0].upper()
-    print(word[0])
     words[i] = "".join(word)
     i += 1
 
