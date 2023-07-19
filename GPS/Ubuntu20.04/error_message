@@ -1,15 +1,148 @@
---- stderr: ublox_gps                           
-CMake Error at CMakeLists.txt:68 (target_link_libraries):
-  The plain signature for target_link_libraries has already been used with
-  the target "ublox_gps".  All uses of target_link_libraries with a target
-  must be either all-keyword or all-plain.
-
-  The uses of the plain signature are here:
-
-   * /opt/ros/foxy/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:145 (target_link_libraries)
-
-
-
+--- stderr: ublox_gps                                 
+In file included from /opt/ros/foxy/include/rclcpp/node.hpp:1224,
+                 from /opt/ros/foxy/include/rclcpp/executors/single_threaded_executor.hpp:28,
+                 from /opt/ros/foxy/include/rclcpp/executors.hpp:22,
+                 from /opt/ros/foxy/include/rclcpp/rclcpp.hpp:146,
+                 from /home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:42:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23: error: no matching function for call to ‘rclcpp::ParameterValue::get<rclcpp::ParameterType>() const’
+  169 |     ).get<ParameterT>();
+      |                       ^
+In file included from /opt/ros/foxy/include/rclcpp/parameter.hpp:26,
+                 from /opt/ros/foxy/include/rclcpp/node_interfaces/node_parameters_interface.hpp:28,
+                 from /opt/ros/foxy/include/rclcpp/node.hpp:51,
+                 from /opt/ros/foxy/include/rclcpp/executors/single_threaded_executor.hpp:28,
+                 from /opt/ros/foxy/include/rclcpp/executors.hpp:22,
+                 from /opt/ros/foxy/include/rclcpp/rclcpp.hpp:146,
+                 from /home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:42:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:148:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_BOOL), const bool&>::type rclcpp::ParameterValue::get() const’
+  148 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:148:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:159:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_INTEGER), const long int&>::type rclcpp::ParameterValue::get() const’
+  159 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:159:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:170:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_DOUBLE), const double&>::type rclcpp::ParameterValue::get() const’
+  170 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:170:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:181:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_STRING), const std::__cxx11::basic_string<char>&>::type rclcpp::ParameterValue::get() const’
+  181 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:181:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:193:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_BYTE_ARRAY), const std::vector<unsigned char, std::allocator<unsigned char> >&>::type rclcpp::ParameterValue::get() const’
+  193 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:193:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:205:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_BOOL_ARRAY), const std::vector<bool, std::allocator<bool> >&>::type rclcpp::ParameterValue::get() const’
+  205 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:205:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:217:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_INTEGER_ARRAY), const std::vector<long int, std::allocator<long int> >&>::type rclcpp::ParameterValue::get() const’
+  217 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:217:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:229:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_DOUBLE_ARRAY), const std::vector<double, std::allocator<double> >&>::type rclcpp::ParameterValue::get() const’
+  229 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:229:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:241:3: note: candidate: ‘template<rclcpp::ParameterType type> constexpr typename std::enable_if<(type == rclcpp::PARAMETER_STRING_ARRAY), const std::vector<std::__cxx11::basic_string<char> >&>::type rclcpp::ParameterValue::get() const’
+  241 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:241:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:254:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_same<T, bool>::value, const bool&>::type rclcpp::ParameterValue::get() const’
+  254 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:254:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_same<T, bool>::value, const bool&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:254:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const bool&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:263:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<(std::is_integral<_Tp>::value && (! std::is_same<T, bool>::value)), const long int&>::type rclcpp::ParameterValue::get() const’
+  263 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:263:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<(std::is_integral<_Tp>::value && (! std::is_same<T, bool>::value)), const long int&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:263:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const long int&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:271:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_floating_point<_Tp>::value, const double&>::type rclcpp::ParameterValue::get() const’
+  271 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:271:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_floating_point<_Tp>::value, const double&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:271:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const double&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:279:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, std::__cxx11::basic_string<char> >::value, const std::__cxx11::basic_string<char>&>::type rclcpp::ParameterValue::get() const’
+  279 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:279:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, std::__cxx11::basic_string<char> >::value, const std::__cxx11::basic_string<char>&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:279:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::__cxx11::basic_string<char>&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:289:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<unsigned char, std::allocator<unsigned char> >&>::value, const std::vector<unsigned char, std::allocator<unsigned char> >&>::type rclcpp::ParameterValue::get() const’
+  289 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:289:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<unsigned char, std::allocator<unsigned char> >&>::value, const std::vector<unsigned char, std::allocator<unsigned char> >&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:289:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::vector<unsigned char, std::allocator<unsigned char> >&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:299:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<bool, std::allocator<bool> >&>::value, const std::vector<bool, std::allocator<bool> >&>::type rclcpp::ParameterValue::get() const’
+  299 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:299:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<bool, std::allocator<bool> >&>::value, const std::vector<bool, std::allocator<bool> >&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:299:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::vector<bool, std::allocator<bool> >&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:309:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<long int, std::allocator<long int> >&>::value, const std::vector<long int, std::allocator<long int> >&>::type rclcpp::ParameterValue::get() const’
+  309 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:309:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<long int, std::allocator<long int> >&>::value, const std::vector<long int, std::allocator<long int> >&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:309:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::vector<long int, std::allocator<long int> >&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:319:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<double, std::allocator<double> >&>::value, const std::vector<double, std::allocator<double> >&>::type rclcpp::ParameterValue::get() const’
+  319 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:319:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<double, std::allocator<double> >&>::value, const std::vector<double, std::allocator<double> >&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:319:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::vector<double, std::allocator<double> >&>’
+/opt/ros/foxy/include/rclcpp/node_impl.hpp: In instantiation of ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’:
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:329:3: note: candidate: ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<std::__cxx11::basic_string<char> >&>::value, const std::vector<std::__cxx11::basic_string<char> >&>::type rclcpp::ParameterValue::get() const’
+  329 |   get() const
+      |   ^~~
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:329:3: note:   template argument deduction/substitution failed:
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp: In substitution of ‘template<class type> constexpr typename std::enable_if<std::is_convertible<type, const std::vector<std::__cxx11::basic_string<char> >&>::value, const std::vector<std::__cxx11::basic_string<char> >&>::type rclcpp::ParameterValue::get() const [with type = rclcpp::ParameterType]’:
+/opt/ros/foxy/include/rclcpp/node_impl.hpp:169:23:   required from ‘auto rclcpp::Node::declare_parameter(const string&, const ParameterT&, const ParameterDescriptor&, bool) [with ParameterT = rclcpp::ParameterType; std::string = std::__cxx11::basic_string<char>; rcl_interfaces::msg::ParameterDescriptor = rcl_interfaces::msg::ParameterDescriptor_<std::allocator<void> >]’
+/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/ublox_gps/src/node.cpp:260:62:   required from here
+/opt/ros/foxy/include/rclcpp/parameter_value.hpp:329:3: error: no type named ‘type’ in ‘struct std::enable_if<false, const std::vector<std::__cxx11::basic_string<char> >&>’
+make[2]: *** [CMakeFiles/ublox_gps.dir/build.make:154: CMakeFiles/ublox_gps.dir/src/node.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [CMakeFiles/Makefile2:136: CMakeFiles/ublox_gps.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2
 ---
-Failed   <<< ublox_gps [0.69s, exited with code 1]
-
+Failed   <<< ublox_gps [12.0s, exited with code 2]
