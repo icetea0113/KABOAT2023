@@ -1,4 +1,15 @@
-[0.199s] WARNING:colcon.colcon_core.prefix_path.colcon:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install' in the environment variable COLCON_PREFIX_PATH doesn't exist
-[0.199s] WARNING:colcon.colcon_ros.prefix_path.ament:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install/rtcm_msgs' in the environment variable AMENT_PREFIX_PATH doesn't exist
-[0.199s] WARNING:colcon.colcon_ros.prefix_path.catkin:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install/rtcm_msgs' in the environment variable CMAKE_PREFIX_PATH doesn't exist
-[0.199s] WARNING:colcon.colcon_ros.prefix_path.catkin:The path '/home/icetea0113/ros2_ws/src/rtcm_msgs' in the environment variable CMAKE_PREFIX_PATH doesn't exist
+--- stderr: ublox_gps                           
+CMake Error at CMakeLists.txt:68 (target_link_libraries):
+  The plain signature for target_link_libraries has already been used with
+  the target "ublox_gps".  All uses of target_link_libraries with a target
+  must be either all-keyword or all-plain.
+
+  The uses of the plain signature are here:
+
+   * /opt/ros/foxy/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:145 (target_link_libraries)
+
+
+
+---
+Failed   <<< ublox_gps [0.69s, exited with code 1]
+
