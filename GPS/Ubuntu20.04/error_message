@@ -1,20 +1,4 @@
-CMake Error at CMakeLists.txt:82 (add_executable):
-  Target "ublox_logger" links to target "rclcpp_components::component" but
-  the target was not found.  Perhaps a find_package() call is missing for an
-  IMPORTED target, or an ALIAS target is missing?
-
-
-CMake Error at CMakeLists.txt:75 (add_executable):
-  Target "ublox_gps_node" links to target "rclcpp_components::component" but
-  the target was not found.  Perhaps a find_package() call is missing for an
-  IMPORTED target, or an ALIAS target is missing?
-
-
-CMake Error at CMakeLists.txt:31 (add_library):
-  Target "ublox_gps" links to target "rclcpp_components::component" but the
-  target was not found.  Perhaps a find_package() call is missing for an
-  IMPORTED target, or an ALIAS target is missing?
-
-
-CMake Generate step failed.  Build files cannot be regenerated correctly.
----
+[0.199s] WARNING:colcon.colcon_core.prefix_path.colcon:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install' in the environment variable COLCON_PREFIX_PATH doesn't exist
+[0.199s] WARNING:colcon.colcon_ros.prefix_path.ament:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install/rtcm_msgs' in the environment variable AMENT_PREFIX_PATH doesn't exist
+[0.199s] WARNING:colcon.colcon_ros.prefix_path.catkin:The path '/home/icetea0113/ros2_ws/src/RTK_GPS_NTRIP/rtcm_msgs/install/rtcm_msgs' in the environment variable CMAKE_PREFIX_PATH doesn't exist
+[0.199s] WARNING:colcon.colcon_ros.prefix_path.catkin:The path '/home/icetea0113/ros2_ws/src/rtcm_msgs' in the environment variable CMAKE_PREFIX_PATH doesn't exist
