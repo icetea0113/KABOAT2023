@@ -1,0 +1,107 @@
+import cv2
+import numpy as np
+import time
+import onnxruntime as ort
+
+# YOLOv5 모델을 ONNX 형식으로 변환하여 저장한 파일 경로
+model_path = 'path/to/yolov5.onnx'
+
+# 원하는 도형의 이름 (예: '주황색 원', '파란색 사각형', '빨간색 삼각형' 등)
+desired_shape = '주황색 원'
+
+# YOLOv5 모델 불러오기
+session = ort.InferenceSession(model_path)
+
+def get_center_coordinates(box):
+    x_min, y_min, x_max, y_max = box
+    center_x = (x_min + x_max) / 2
+    center_y = (y_min + y_max) / 2
+    return center_x, center_y
+
+def analyze_frame(frame):
+    # 이미지 크기를 모델 입력 크기에 맞게 조정
+    input_shape = (640, 640)  # 모델 입력 크기에 따라 조정 (예: (416, 416), (512, 512) 등)
+    image_resized = cv2.resize(frame, input_shape)
+
+    # 이미지를 모델 입력 형식에 맞게 전처리
+    image_preprocessed = image_resized[..., ::-1].transpose(2, 0, 1) / 255.0  # BGR to RGB, HWC to CHW
+    image_preprocessed = np.expand_dims(image_preprocessed, axis=0).astype(np.float32)
+
+    # YOLOv5 모델 추론
+    predicted_outputs = session.run(None, {'images': image_preprocessed})
+    predicted_boxes = predicted_outputs[0]
+    predicted_classes = predicted_outputs[1]
+
+    # 이미지 너비
+    image_width = frame.shape[1]
+
+    # 모델의 결과를 이용하여 원하는 도형의 좌표와 가운데에 있는 도형의 좌표를 얻어옴
+    desired_shape_coord = None
+    center_shape_coord = None
+
+    for box, class_idx in zip(predicted_boxes, predicted_classes):
+        class_name = session.get_outputs()[1].name
+        class_name = class_name[class_idx]
+
+        # 원하는 도형의 좌표를 얻어옴
+        if class_name == desired_shape:
+            desired_shape_coord = get_center_coordinates(box)
+
+        # 가운데에 있는 도형의 좌표를 얻어옴
+        center_x, center_y = get_center_coordinates(box)
+        if image_width * 0.4 <= center_x <= image_width * 0.6:
+            center_shape_coord = (center_x, center_y)
+
+        # 결과를 이미지에 표시 (선택 사항)
+        x_min, y_min, x_max, y_max = box.astype(int)
+        cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
+
+    if desired_shape_coord is not None and center_shape_coord is not None:
+        # 원하는 도형과 가운데에 있는 도형의 좌표를 비교하여 움직임 결정
+        threshold = 30  # 좌우로 움직일 임계값 설정 (픽셀 단위)
+        if desired_shape_coord[0] < center_shape_coord[0] - threshold:
+            print("왼쪽으로 가라고 얘기하고")
+        elif desired_shape_coord[0] > center_shape_coord[0] + threshold:
+            print("오른쪽으로 가라고 얘기하고")
+        else:
+            print("가운데로 가라고 얘기하고")
+    else:
+        # 원하는 도형이나 가운데에 있는 도형을 인식하지 못한 경우
+        # 제자리에서 왼쪽으로 회전하도록 함
+        print("회전하세요")
+
+# 카메라로부터 영상을 받아오는 객체 생성
+cap = cv2.VideoCapture(0)
+
+# 분석 주기 설정 (초 단위)
+analysis_interval = 1.0
+
+# 이전 프레임 처리 시간 저장 변수
+prev_frame_time = 0
+
+while True:
+    # 영상 캡처
+    ret, frame = cap.read()
+
+    if ret:
+        # 현재 시간 기록
+        current_time = time.time()
+
+        # 0.5~1초 간격으로 분석
+        if current_time - prev_frame_time >= analysis_interval:
+            # 프레임 분석
+            analyze_frame(frame)
+
+            # 현재 시간으로 업데이트
+            prev_frame_time = current_time
+
+        # 결과 이미지 출력 (선택 사항)
+        cv2.imshow('결과', frame)
+
+    # 'q' 키를 누르면 종료
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# 리소스 정리
+cap.release()
+cv2.destroyAllWindows()
