@@ -11,7 +11,7 @@ import pymap3d as pm
 #from queue import Queue
 #import time
 from mechaship_interfaces.msg import  Heading
-#from mechaship_interfaces.srv import Key, ThrottlePercentage, RGBColor, ThrottlePulseWidth
+from mechaship_interfaces.srv import Key, ThrottlePercentage, RGBColor, ThrottlePulseWidth
 #from filterpy.kalman import KalmanFilter
 
 class MotorControlNode(Node):
@@ -32,7 +32,16 @@ class MotorControlNode(Node):
         self.subscription
         
         self.subscription = self.create_subscription(Heading, "heading", self.heading_listener_callback, qos_profile)
-        self.subscription        
+        self.subscription   
+        
+        self.set_throttle_handler_left = self.create_client(
+            ThrottlePercentage, "/actuators/throttle/set_percentage_left"
+        )
+        
+        self.set_throttle_handler_right = self.create_client(
+            ThrottlePercentage, "/actuators/throttle/set_percentage_right"
+        )
+             
         
         self.motor_pid = PID(30, 0, 0.05)# 3.3m를 기준으로 설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
         self.motor_pid.output_limits = (0, 100) # 출력 범위 제한
@@ -90,7 +99,9 @@ class MotorControlNode(Node):
         if(self.huzin_mode==1):
             motor_speed *= -1 # 역추진 어떻게 하는지 보고 수정하기
 
-        if(error<3.0):# error 정의하기
+        self.go_straight(motor_speed)
+        
+        if(abs(self.current_position-self.target_position)<3.0):# error 정의하기
             self.pid_status=0
             self.before_diff = self.diff
             self.current_position = None
@@ -121,14 +132,16 @@ class MotorControlNode(Node):
            
         #error가 양수이면 시계방향 회전, 음수이면 반시계방향 회전                
         motor_speed = self.angle_pid(error)
-        #if(error>0):
-        #   역방향 추진    
+        if(error>0):
+            self.turn_angle(motor_speed,1)
+        else:
+            self.turn_anlge(motor_speed,2)
             
         if(error<3.0):# error 정의하기
             self.pid_status=2
             
                
-    #누적 오차로 예상 이외의 점으로 가는거 괜찮나?
+    #누적 오차로 예상 이외의 점으로 가는거 괜찮나? # 오차도 어느 범위 왔을 때 멈출지랑 들어왔을 때 조금 그 값으로 수렴하게 시간을 더 줄 수도 있다.
     
     def heading_listener_callback(self, data):
         self.now_heading = data.yaw
@@ -161,7 +174,33 @@ class MotorControlNode(Node):
     
     def angle_difference(a, b):
         diff = (b - a + 180) % 360 - 180
-        return diff    
+        return diff
+    
+    def go_straight(self,percentage):# 음수로 역회전을 하는건가?
+        throttle = ThrottlePercentage.Request()
+        left_percentage= 78*percentage/100
+        right_percentage= 82*percentage/100
+        
+        throttle.percentage = left_percentage
+        self.set_throttle_handler_left.call_async(throttle)
+        
+        throttle.percentage = right_percentage
+        self.set_throttle_handler_right.call_async(throttle)
+        
+    def turn_angle(self,percentage,direction):# 음수로 역회전을 하는건가?
+        throttle = ThrottlePercentage.Request()
+        left_percentage= -78*percentage/100
+        right_percentage= 82*percentage/100
+        
+        if(direction == 2):
+            left_percentage *= -1            
+            right_percentage *= -1
+                    
+        throttle.percentage = left_percentage
+        self.set_throttle_handler_left.call_async(throttle)
+        
+        throttle.percentage = right_percentage
+        self.set_throttle_handler_right.call_async(throttle)    
        
     
 def main(args=None):
@@ -180,11 +219,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-#yaw 0도 만들어주는거
-#gps : #반올림 해서 하는게 맞을지, 배열에 1 올렸다가 지울지, 여유 범위를 어느정도로 할지 (40으로 하고 싶다. - 안되는 case 생각해보자)그냥 반올림만 해도 될거 같은데 
-#다음 index로 가는 go code와 도착했다는 기준(출발하면서 목표 index를 정해둬야함. self로)
-
-#go_goal 코드(throttle )
-
-#다 막혔다 했을 때 --> 다시 값 받게
-#경기장 밖(음의값 index 가지는) -->if문으로 해결
