@@ -55,6 +55,9 @@ class MotorControlNode(Node):
         self.curr_x = None
         self.curr_y = None
         
+        #후진모드
+        self.huzin_mode = 0
+        
     # 큐에서 방향 꺽일 때를 기준으로 목표 이동 거리 및 방향 선택
  
     # 직진 할 때 거리 제어
@@ -83,11 +86,15 @@ class MotorControlNode(Node):
         motor_speed = self.motor_pid(self.current_position)
             # motor_speed의 비율로 양 모터 같은 출력 나오게 채택
             # 같은 출력은 수조에서 실험후 기입
+            
+        if(self.huzin_mode==1):
+            motor_speed *= -1 # 역추진 어떻게 하는지 보고 수정하기
 
         if(error<3.0):# error 정의하기
             self.pid_status=0
             self.before_diff = self.diff
             self.current_position = None
+            self.huzin_mode = 0
             
             #pid 다 썼으면 초기화 해두기
             self.motor_pid = PID(30, 0, 0.05)# 3.3m를 기준으로 설계
@@ -127,10 +134,12 @@ class MotorControlNode(Node):
         self.now_heading = data.yaw
 
         if(self.pid_status == 1):
-            
-            # 후진 코드 만들기
-            
-            self.pid_angle()
+            # 후진 하는 상황인지 보고 아니면 각도 조정
+            if((self.before_diff==1 and self.diff ==4) or (self.before_diff==4 and self.diff ==1) or (self.before_diff==2 and self.diff ==3) or (self.before_diff==3 and self.diff ==2)):
+                self.huzin_mode = 1
+                self.pid_status = 2
+            else:                
+                self.pid_angle()
         
     def gps_listener_callback(self, gps):
         #self.get_logger().info('gps data: "%s"' % gps)
