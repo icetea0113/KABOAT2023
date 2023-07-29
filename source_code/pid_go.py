@@ -28,11 +28,15 @@ class MotorControlNode(Node):
             depth=1,
         )
 
-        self.subscription = self.create_subscription(NavSatFix, "fix", self.gps_listener_callback, qos_profile)
-        self.subscription
+        self.subscription1 = self.create_subscription(NavSatFix, "fix", self.gps_listener_callback, qos_profile)
+        self.subscription1
         
-        self.subscription = self.create_subscription(Heading, "heading", self.heading_listener_callback, qos_profile)
-        self.subscription   
+        self.subscription2 = self.create_subscription(Heading, "heading", self.heading_listener_callback, qos_profile)
+        self.subscription2   
+        
+        #self.subscription3 = self.create_subscription( ~, "~", self.node_listener_callback, qos_profile)
+        #self.subscription3
+        
         
         self.set_throttle_handler_left = self.create_client(
             ThrottlePercentage, "/actuators/throttle/set_percentage_left"
@@ -58,11 +62,12 @@ class MotorControlNode(Node):
         self.now_heading = 0.0
         #pid 시작할 때 방향과 갯수
         self.num = 0
-        self.diff = 1
-        self.before_diff = 1
+        self.go = 1
+        self.before_go = 1
         #pid 시작할 때 현재 노드
-        self.curr_x = None
+        self.curr_x = None # 노드값이 4라면 4부터 5까지 중간은 4.5
         self.curr_y = None
+        self.diff = None
         
         #후진모드
         self.huzin_mode = 0
@@ -71,25 +76,22 @@ class MotorControlNode(Node):
  
     # 직진 할 때 거리 제어
     def pid_distance(self,y,x):
-        
-
-           
-        #목표 지점 정하기 (한번만 하면 돼서, 수정해주면 좋을 거 같다), status가 0에서 1로 바뀌며 diff, num 넘겨 줄 때 같이 해주면 될듯
+      
+        #목표 지점 정하기 (한번만 하면 돼서, 수정해주면 좋을 거 같다), status가 0에서 1로 바뀌며 go, num 넘겨 줄 때 같이 해주면 될듯
         if(self.current_position == None):
-            if(self.diff == 1):
+            if(self.go == 1):
                 self.target_position = self.curr_y + self.num
-            elif(self.diff == 4):
+            elif(self.go == 4):
                 self.target_position = self.curr_y - self.num
-            elif(self.diff == 2):
+            elif(self.go == 2):
                 self.target_position = self.curr_x + self.num
-            elif(self.diff == 3):
+            elif(self.go == 3):
                 self.target_position = self.curr_x - self.num
             
-        if(self.diff ==1 or self. diff == 4):
+        if(self.go ==1 or self.go == 4):
             self.current_position = y
         else:
-            self.current_position = x
-            
+            self.current_position = x            
                 
         self.motor_pid.setpoint = self.target_position           
         motor_speed = self.motor_pid(self.current_position)
@@ -101,9 +103,9 @@ class MotorControlNode(Node):
 
         self.go_straight(motor_speed)
         
-        if(abs(self.current_position-self.target_position)<3.0):# error 정의하기
+        if(abs(self.current_position-self.target_position)<0.1):# error 정의하기
             self.pid_status=0
-            self.before_diff = self.diff
+            self.before_go = self.go
             self.current_position = None
             self.huzin_mode = 0
             
@@ -119,11 +121,11 @@ class MotorControlNode(Node):
         #모터를 반대 방향으로 같은 크기로 돌리는데 그 크기를 각도 오차를 통해서 pid 제어
         #이때는 비례상수가 최대 차이 180도 일 때 임의의 같은 출력(ex 60출력) -> 비례상수 1/3수준으로 지정
 
-        if(self.diff == 1):
+        if(self.go == 1):
             self.target_angle = 0.0
-        elif(self.diff ==4):
+        elif(self.go ==4):
             self.target_angle = 180.0
-        elif(self.diff ==2):
+        elif(self.go ==2):
             self.target_angle =-90.0
         else:
             self.target_angle=90.0
@@ -139,6 +141,7 @@ class MotorControlNode(Node):
             
         if(error<3.0):# error 정의하기
             self.pid_status=2
+            #1초나 2초 기다리는 코드 추가할까?
             
                
     #누적 오차로 예상 이외의 점으로 가는거 괜찮나? # 오차도 어느 범위 왔을 때 멈출지랑 들어왔을 때 조금 그 값으로 수렴하게 시간을 더 줄 수도 있다.
@@ -148,7 +151,7 @@ class MotorControlNode(Node):
 
         if(self.pid_status == 1):
             # 후진 하는 상황인지 보고 아니면 각도 조정
-            if((self.before_diff==1 and self.diff ==4) or (self.before_diff==4 and self.diff ==1) or (self.before_diff==2 and self.diff ==3) or (self.before_diff==3 and self.diff ==2)):
+            if((self.before_go==1 and self.go ==4) or (self.before_go==4 and self.go ==1) or (self.before_go==2 and self.go ==3) or (self.before_go==3 and self.go ==2)):
                 self.huzin_mode = 1
                 self.pid_status = 2
             else:                
@@ -161,6 +164,15 @@ class MotorControlNode(Node):
 
         if(self.pid_status ==2):
             self.pid_distance(y,x)
+    
+    def node_listener_callback(self, data):
+        if(self.pid_status==0):
+            self.num = data.num
+            self.go = data.go
+
+            self.curr_x = data.curr_x*0.5 # 노드값이 4라면 4부터 5까지 중간은 4.5
+            self.curr_y = data.curr_y*0.5 # 그리고 이건 경계선까지임
+            self.pid_status = 1        
               
     def gps_enu_converter(self,gnss):
         e, n, u = pm.geodetic2enu(gnss[0], gnss[1], gnss[2], self.origin[0], self.origin[1], self.origin[2])
