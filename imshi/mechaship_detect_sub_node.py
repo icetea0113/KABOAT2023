@@ -26,7 +26,7 @@ class MechashipDetectSub(Node):
 
         self.br = CvBridge()
         self.detections = DetectionArray().detections
-        self.target = ['OC', 'RT']
+        self.target = ['OC', 'OT', 'OS', 'OP', 'RC', 'RT', 'RS', 'RP', 'GC', 'GT', 'GS', 'GP', 'BC', 'BT', 'BS', 'BP']
 
     def detection_listener_callback(self, data):
         self.get_logger().info("detection cnt: %s" % (len(data.detections)))
