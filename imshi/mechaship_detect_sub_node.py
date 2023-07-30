@@ -1,10 +1,10 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import qos_profile_sensor_data, QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
-from mechaship_interfaces.msg import DetectionArray
+from mechaship_interfaces.msg import DetectionArray, Goal
 
 
 class MechashipDetectSub(Node):
@@ -20,30 +20,64 @@ class MechashipDetectSub(Node):
             self.detection_listener_callback,
             qos_profile_sensor_data,
         )
-
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT,
+            history=QoSHistoryPolicy.RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+            depth=1,
+        )
+        self.target_goal = self.create_publisher(Goal, 'goal', qos_profile)
         self.image_subscription  # prevent unused variable warning
         self.detection_subscription  # prevent unused variable warning
 
         self.br = CvBridge()
         self.detections = DetectionArray().detections
-        self.target = ['OC', 'OT', 'OS', 'OP', 'RC', 'RT', 'RS', 'RP', 'GC', 'GT', 'GS', 'GP', 'BC', 'BT', 'BS', 'BP']
+        self.set_left = ['BC','RC','GC']
+        self.set_center = ['BT','RT','GT']
+        self.set_right = ['BS','RS','GS']
+        self.target = ['RT']
+        self.goal = 0
 
     def detection_listener_callback(self, data):
         self.get_logger().info("detection cnt: %s" % (len(data.detections)))
         self.detections = data.detections
 
     def image_listener_callback(self, data):
+        right = False
+        center = False
+        left = False
         origin_image = self.br.imgmsg_to_cv2(data, "bgr8")
         if origin_image.all() == None or len(origin_image) == 0:
             return
-
         if len(self.detections) != 0:
             for detection in self.detections:
-                if detection in self.target:
-                    self.x = int((detection.xmin + detection.xmax) / 2)
-                    print(self.x + "target in screen")
+                if (detection.name in self.set_right):
+                    right = True
+                    if detection.name in self.target:
+                        print("target in right")
+                        self.goal = 3
+                    else:
+                        if right == True and center == False and left == False:
+                            pass
+                        #more turn code in here
+                elif (detection.name in self.set_center):
+                    center = True
+                    right = True
+                    if detection.name in self.target:
+                        self.goal = 2
+                        print("target in center")
+                    else:
+                        if right == True and center == True and left == False:
+                            self.goal = 1
+                elif (detection.name in self.set_left):
+                    left = True
+                    center = True
+                    right = True
+                    if detection.name in self.target:
+                        self.goal = 1
+                        print("target in left")
                 else:
                     print("target not in screen")
+                    #more turn code in here
 
                 cv2.rectangle(
                     origin_image,
@@ -54,6 +88,9 @@ class MechashipDetectSub(Node):
                 )
         cv2.imshow("detected image", origin_image)
         cv2.waitKey(1)
+        goal = Goal()
+        goal.goal = self.goal
+        self.target_goal.publish(goal)
 
 
 def main(args=None):
