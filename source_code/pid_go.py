@@ -10,7 +10,7 @@ import pymap3d as pm
 #import numpy as np
 #from queue import Queue
 #import time
-from mechaship_interfaces.msg import  Heading
+from mechaship_interfaces.msg import  RelHeading, Load #Load.msg file in (list list_load,  int64 curr_x,  int64 curr_y)
 from mechaship_interfaces.srv import Key, ThrottlePercentage, RGBColor, ThrottlePulseWidth
 #from filterpy.kalman import KalmanFilter
 
@@ -31,12 +31,11 @@ class MotorControlNode(Node):
         self.subscription1 = self.create_subscription(NavSatFix, "fix", self.gps_listener_callback, qos_profile)
         self.subscription1
         
-        self.subscription2 = self.create_subscription(Heading, "heading", self.heading_listener_callback, qos_profile)
+        self.subscription2 = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
         self.subscription2   
         
-        #self.subscription3 = self.create_subscription( ~, "~", self.node_listener_callback, qos_profile)
-        #self.subscription3
-        
+        self.subscription3 = self.create_subscription(Load, "load", self.node_listener_callback, qos_profile)
+        self.subscription3
         
         self.set_throttle_handler_left = self.create_client(
             ThrottlePercentage, "/actuators/throttle/set_percentage_left"
@@ -46,7 +45,6 @@ class MotorControlNode(Node):
             ThrottlePercentage, "/actuators/throttle/set_percentage_right"
         )
              
-        
         self.motor_pid = PID(30, 0, 0.05)# 3.3m를 기준으로 설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
         self.motor_pid.output_limits = (0, 100) # 출력 범위 제한
         self.current_position = None
@@ -61,9 +59,10 @@ class MotorControlNode(Node):
 
         self.now_heading = 0.0
         #pid 시작할 때 방향과 갯수
-        self.num = 0
+        self.num = 1
         self.go = 1
         self.before_go = 1
+        # self.aft_go = 1
         #pid 시작할 때 현재 노드
         self.curr_x = None # 노드값이 4라면 4부터 5까지 중간은 4.5
         self.curr_y = None
@@ -147,7 +146,7 @@ class MotorControlNode(Node):
     #누적 오차로 예상 이외의 점으로 가는거 괜찮나? # 오차도 어느 범위 왔을 때 멈출지랑 들어왔을 때 조금 그 값으로 수렴하게 시간을 더 줄 수도 있다.
     
     def heading_listener_callback(self, data):
-        self.now_heading = data.yaw
+        self.now_heading = data.rel_yaw
 
         if(self.pid_status == 1):
             # 후진 하는 상황인지 보고 아니면 각도 조정
@@ -167,13 +166,21 @@ class MotorControlNode(Node):
     
     def node_listener_callback(self, data):
         if(self.pid_status==0):
-            self.num = data.num
-            self.go = data.go
-
+            self.list_load = data.list_load
             self.curr_x = data.curr_x*0.5 # 노드값이 4라면 4부터 5까지 중간은 4.5
             self.curr_y = data.curr_y*0.5 # 그리고 이건 경계선까지임
-            self.pid_status = 1        
-              
+
+            #for i in range (len(self.list_load)-1):
+            while (i < len(self.list_load) - 1 )and(self.list_load[i] == self.list_load[i+1] and (self.before_go == self.list_load[0])):
+                self.go = self.list_load[i]
+                self.num +=1
+                i +=1
+                self.pid_status = 1 
+
+            if(self.before_go != self.list_load[0]):
+                self.go = self.list_load[0]
+                self.pid_status = 2
+
     def gps_enu_converter(self,gnss):
         e, n, u = pm.geodetic2enu(gnss[0], gnss[1], gnss[2], self.origin[0], self.origin[1], self.origin[2])
         return e, n
