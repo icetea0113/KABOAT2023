@@ -12,7 +12,7 @@ class MechashipDetectSub(Node):
         super().__init__("mechaship_detect_sub_node")
 
         self.image_subscription = self.create_subscription(
-            Image, "/Image", self.image_listener_callback, qos_profile_sensor_data
+            Image, "/camera/color/image_raw", self.image_listener_callback, qos_profile_sensor_data
         )
         self.detection_subscription = self.create_subscription(
             DetectionArray,
@@ -38,47 +38,54 @@ class MechashipDetectSub(Node):
         self.goal = 0
 
     def detection_listener_callback(self, data):
-        self.get_logger().info("detection cnt: %s" % (len(data.detections)))
-        self.detections = data.detections
-
-    def image_listener_callback(self, data):
         right = False
         center = False
         left = False
-        origin_image = self.br.imgmsg_to_cv2(data, "bgr8")
-        if origin_image.all() == None or len(origin_image) == 0:
-            return
+        # self.get_logger().info("detection cnt: %s" % (len(data.detections)))
+        self.detections = data.detections
         if len(self.detections) != 0:
             for detection in self.detections:
+                print(detection.name)
                 if (detection.name in self.set_right):
                     right = True
                     if detection.name in self.target:
                         print("target in right")
                         self.goal = 3
-                    else:
-                        if right == True and center == False and left == False:
-                            pass
-                        #more turn code in here
                 elif (detection.name in self.set_center):
                     center = True
-                    right = True
                     if detection.name in self.target:
                         self.goal = 2
                         print("target in center")
-                    else:
-                        if right == True and center == True and left == False:
-                            self.goal = 1
                 elif (detection.name in self.set_left):
                     left = True
-                    center = True
-                    right = True
                     if detection.name in self.target:
                         self.goal = 1
                         print("target in left")
-                else:
-                    print("target not in screen")
-                    #more turn code in here
+            if right and not center and not left:
+                # Add your turn code here
+                pass
+            elif not right and center and not left:
+                # Add your turn code here
+                pass
+            elif not right and not center and left:
+                # Add your turn code here
+                pass
+            else:
+                print("target not in screen")
+                # Add your turn code here
+            goal = Goal()
+            goal.goal = self.goal
+            print(goal)
+            self.target_goal.publish(goal)
 
+
+    def image_listener_callback(self, data):
+
+        origin_image = self.br.imgmsg_to_cv2(data, "bgr8")
+        if origin_image.all() == None or len(origin_image) == 0:
+            return
+        if len(self.detections) != 0:
+            for detection in self.detections:
                 cv2.rectangle(
                     origin_image,
                     (int(detection.xmin), int(detection.ymin)),
@@ -88,9 +95,7 @@ class MechashipDetectSub(Node):
                 )
         cv2.imshow("detected image", origin_image)
         cv2.waitKey(1)
-        goal = Goal()
-        goal.goal = self.goal
-        self.target_goal.publish(goal)
+
 
 
 def main(args=None):
