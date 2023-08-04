@@ -33,6 +33,9 @@
 #include <stdexcept>
 #include <thread>
 
+#include <iostream>
+//#include <source_location>
+
 #include <asio/io_service.hpp>
 #include <asio/serial_port.hpp>
 #include <asio/serial_port_base.hpp>
@@ -427,14 +430,18 @@ bool Gps::configUsb(uint16_t tx_ready,
   return configure(port);
 }
 
-bool Gps::configRate(uint16_t meas_rate, uint16_t nav_rate) {
-  RCLCPP_DEBUG(logger_, "Configuring measurement rate to %u ms and nav rate to %u cycles",
-               meas_rate, nav_rate);
+bool Gps::configRate(uint16_t meas_rate, uint16_t nav_rate ){//, std:source_location &location) {
 
+  // std::cout << "dfaiwlb hkjse " << std::endl;
+  //     std::cout << location.file_name() << ":"
+  //           << location.line() << ":"
+  //           << location.function_name();
   ublox_msgs::msg::CfgRATE rate;
-  rate.meas_rate = meas_rate;
-  rate.nav_rate = nav_rate;  //  must be fixed at 1 for ublox 5 and 6
+  rate.meas_rate = 200;
+  rate.nav_rate = 1;  //  must be fixed at 1 for ublox 5 and 6
   rate.time_ref = ublox_msgs::msg::CfgRATE::TIME_REF_GPS;
+    RCLCPP_DEBUG(logger_, "Configuring measurement rate to %u ms and nav rate to %u cycles",
+               rate.meas_rate, rate.nav_rate);
   return configure(rate);
 }
 

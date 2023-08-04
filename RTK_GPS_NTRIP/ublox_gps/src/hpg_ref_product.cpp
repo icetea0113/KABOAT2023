@@ -55,6 +55,7 @@ bool getRosInt(rclcpp::Node* node, const std::string& key, std::vector<int8_t> &
 void HpgRefProduct::getRosParams() {
   if (getRosBoolean(node_, "config_on_startup")) {
     if (nav_rate_ * meas_rate_ != 1000) {
+        std::cout << nav_rate_ <<", " << meas_rate_ << std::endl;
       RCLCPP_WARN(node_->get_logger(), "For HPG Ref devices, nav_rate should be exactly 1 Hz.");
     }
 
@@ -144,13 +145,15 @@ bool HpgRefProduct::configureUblox(std::shared_ptr<ublox_gps::Gps> gps) {
     }
     // Reset the Survey In
     // For Survey in, meas rate must be at least 1 Hz
-    uint16_t meas_rate_temp = meas_rate_ < 1000 ? meas_rate_ : 1000; // [ms]
+    // uint16_t meas_rate_temp = meas_rate_ < 1000 ? meas_rate_ : 1000; // [ms]
+    uint16_t meas_rate_temp = 250; // [ms]
     // If measurement period isn't a factor of 1000, set to default
     if (1000 % meas_rate_temp != 0) {
       meas_rate_temp = kDefaultMeasPeriod;
     }
     // Set nav rate to 1 Hz during survey in
     if (!gps->configRate(meas_rate_temp, 1000 / meas_rate_temp)) {
+       std::cout << nav_rate_ <<", " << meas_rate_ << std::endl;
       throw std::runtime_error(std::string("Failed to set nav rate to 1 Hz") +
                                "before setting TMODE3 to survey-in.");
     }
@@ -194,7 +197,7 @@ void HpgRefProduct::callbackNavSvIn(const ublox_msgs::msg::NavSVIN& m) {
 bool HpgRefProduct::setTimeMode(std::shared_ptr<ublox_gps::Gps> gps) {
   RCLCPP_INFO(node_->get_logger(), "Setting mode (internal state) to Time Mode");
   mode_ = TIME;
-
+  std::cout << "Hpg 200 line : " << nav_rate_ <<", " << meas_rate_ << std::endl;  
   // Set the Measurement & nav rate to user config
   // (survey-in sets nav_rate to 1 Hz regardless of user setting)
   if (!gps->configRate(meas_rate_, nav_rate_)) {

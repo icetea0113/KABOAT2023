@@ -12,6 +12,7 @@
 #include <ublox_msgs/msg/nav_pvt.hpp>
 #include <ublox_msgs/msg/nav_sat.hpp>
 #include <ublox_msgs/msg/rxm_rtcm.hpp>
+#include <ublox_msgs/msg/cfg_rate.hpp>
 
 #include <ublox_gps/ublox_firmware8.hpp>
 #include <ublox_gps/utils.hpp>
@@ -144,6 +145,7 @@ bool UbloxFirmware8::configureUblox(std::shared_ptr<ublox_gps::Gps> gps) {
   //
   // First, get the current GNSS configuration
   ublox_msgs::msg::CfgGNSS cfg_gnss;
+  ublox_msgs::msg::CfgRATE cfg_rate;
   if (gps->poll(cfg_gnss)) {
     RCLCPP_DEBUG(node_->get_logger(), "Read GNSS config.");
     RCLCPP_DEBUG(node_->get_logger(), "Num. tracking channels in hardware: %i", cfg_gnss.num_trk_ch_hw);

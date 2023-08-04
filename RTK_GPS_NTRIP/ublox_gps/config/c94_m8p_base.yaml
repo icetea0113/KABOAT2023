@@ -16,7 +16,7 @@ ublox_gps_node:
     dr_limit: 0
     enable_ppp: false           # Not supported by C94-M8P
 
-    rate: 1.0                   # Measurement rate in Hz
+    rate: 4.0                   # Measurement rate in Hz
     nav_rate: 1                 # in number of measurement cycles
 
     uart1:

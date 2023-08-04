@@ -182,9 +182,9 @@ def moveAndRescan(graph, queue, s_current, scan_range, k_m):
         elif current_x_y[0]-next_x_y[0] == -1:
             direction.append(3)
         elif current_x_y[1]-next_x_y[1] == 1:
-            direction.append(1)
-        elif current_x_y[1]-next_x_y[1] == -1:
             direction.append(4)
+        elif current_x_y[1]-next_x_y[1] == -1:
+            direction.append(1)
         path.append(s_new)  # Add the new state to the path
         s_current = s_new
     s_new = path[1]

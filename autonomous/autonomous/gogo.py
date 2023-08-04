@@ -7,7 +7,7 @@ from sensor_msgs.msg import LaserScan, NavSatFix
 import math
 import numpy as np
 from numpy.polynomial import Polynomial
-from mechaship_interfaces.msg import Classification, ClassificationArray, Detection, DetectionArray
+from mechaship_interfaces.msg import Classification, ClassificationArray, Detection, DetectionArray, RelHeading
 from mechaship_interfaces.srv import Key, ThrottlePercentage, RGBColor
 
 import pymap3d as pm
@@ -96,8 +96,16 @@ class Autonomous(Node):
             depth=1,
         )
         
-        self.now_gps = [35.232242299978, 129.079349539998]
-        
+        self.stadium_gps = [(35.2323047, 129.0793592),(35.23218089999, 129.0792796),(35.2321492999,129.0793337), (35.2322719,129.07941599999)]
+        self.stadium_enu = [[0, 0]]
+        self.angle = -10000
+        for value in self.stadium_gps[1:]:
+            e, n, _ = pm.geodetic2enu(value[0], value[1], 0, self.stadium_gps[0][0], self.stadium_gps[0][1], 0)
+            if self.angle == -10000:
+                self.angle = math.atan2(n,e)
+            e, n = self.get_xy(e, n, self.angle)
+            self.stadium_enu.append([e, n])
+        self.now_position = "x30y30"
         # subscriber 선언
         self.gps_subscription = self.create_subscription(
             NavSatFix, "/fix", self.gps_listener_callback, qos_profile
@@ -109,6 +117,8 @@ class Autonomous(Node):
             qos_profile,
         )
         
+        self.rel_yaw_subcription = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
+        
         self.scan_subscription = self.create_subscription(LaserScan, "/scan", self.listener_callback, qos_profile)
         self.curr_x_publish = self.create_publisher(Int64, "curr_x", qos_profile)
         self.curr_y_publish = self.create_publisher(Int64, "curr_y", qos_profile)
@@ -118,14 +128,12 @@ class Autonomous(Node):
     
     def heading_listener_callback(self, data):
         # Heading -> [pitch, roll, yaw]
-        self.now_heading = data.yaw
-        self.now_heading_rad = self.now_heading * math.pi / 180
+        self.now_heading = data.rel_yaw
+        
+        self.now_heading_rad = -self.now_heading * math.pi / 180
 
     def listener_callback(self, data):
-        self.gps_listener_callback()
-               
         global X_DIM, Y_DIM
-        
         # # Go through each element and replace with row (width of grid)
         for i in range(X_DIM):
             for j in range(Y_DIM):
@@ -134,21 +142,37 @@ class Autonomous(Node):
             
         self.obstacle = []
         #---------------------------------------------------#
-        # angle = data.angle_min - self.now_heading_rad
+        # self.angle = data.self.angle_min - self.now_heading_rad
         angle = data.angle_min
-        self.d_theta = data.angle_increment # 0.6도 (degree)
         rel_x, rel_y, abs_x, abs_y = 0, 0, 0, 0
+        
         for scan_data in data.ranges:
-            angle += self.d_theta - math.pi/2
+            angle += data.angle_increment
             if (scan_data != 0) and (not math.isinf(scan_data)) and (scan_data <= 10):
                 rel_x = scan_data*math.cos(angle)/GRID_INTERVAL
                 rel_y = scan_data*math.sin(angle)/GRID_INTERVAL
+                #print("len :" + str(scan_data) + ", angle: " + str(angle)+ ", rel_x : " + str(rel_x) + ", rel_y : " + str(rel_y))
                 now_position_enu = stateNameToCoords(self.now_position)
-                abs_x = int(np.floor(now_position_enu[0] + rel_x))
-                abs_y = int(np.floor(now_position_enu[1] + rel_y))
-                if(abs_x >= 0 and abs_y >= 0 and abs_x <= 72 and abs_y <=72 and (abs_x != now_position_enu[0] or abs_y != now_position_enu[1])):
+                abs_float_x = rel_x*math.cos(self.now_heading_rad) + rel_y*math.sin(self.now_heading_rad) + now_position_enu[0]
+                abs_float_y = -rel_x*math.sin(self.now_heading_rad) + rel_y*math.cos(self.now_heading_rad) + now_position_enu[1]
+                abs_x = int(np.floor(abs_float_x))
+                abs_y = int(np.floor(abs_float_y))
+                #print(abs_x, abs_y)
+                if (0 <= abs_x < 72 and 0 <= abs_y < 72
+                and (abs_x != now_position_enu[0] or abs_y != now_position_enu[1])
+                and ((abs_float_x - abs_x) > 0.5 or (abs_float_x - abs_y > 0.5))):
                     self.obstacle.append([abs_x, abs_y])
-            angle += math.pi/2
+                    self.obstacle.append([abs_x + 1, abs_y])
+                    self.obstacle.append([abs_x, abs_y + 1])
+                    self.obstacle.append([abs_x - 1, abs_y])
+                    self.obstacle.append([abs_x, abs_y - 1])
+                    # 대각선
+                    # self.obstacle.append([abs_x + 1, abs_y + 1])
+                    # self.obstacle.append([abs_x + 1, abs_y - 1])
+                    # self.obstacle.append([abs_x - 1, abs_y + 1])
+                    # self.obstacle.append([abs_x - 1, abs_y - 1])
+        self.dstarlite()
+            
         
     def detection_listener_callback(self, data):
         if len(self.goal_coords) == 3 and data == 1:
@@ -158,27 +182,20 @@ class Autonomous(Node):
         elif len(self.goal_coords) == 3 and data == 3:
             pass
         
-    def get_xy(self, e, n, angle):
+    def get_xy(self, e, n,angle):
         x = e * math.cos(angle) + n * math.sin(angle)
         y = -e * math.sin(angle) + n * math.cos(angle)
         return x,y
-
-    def gps_listener_callback(self):
-        self.now_gps[0] -= 0.000001
-        self.now_gps[1] += 0.000001
-        stadium_gps = [(35.2323047, 129.0793592),(35.23218089999, 129.0792796),(35.2321492999,129.0793337), (35.2322719,129.07941599999)]
-        stadium_enu = [[0, 0]]
-        angle = -10000
-        for value in stadium_gps[1:]:
-            e, n, _ = pm.geodetic2enu(value[0], value[1], 0, stadium_gps[0][0], stadium_gps[0][1], 0)
-            if angle == -10000:
-                angle = math.atan2(n,e)
-            e, n = self.get_xy(e, n, angle)
-            stadium_enu.append([e, n])
-            
-        now_e, now_n, _ = pm.geodetic2enu(self.now_gps[0], self.now_gps[1], 0, stadium_gps[0][0], stadium_gps[0][1], 0)
-        now_e, now_n = self.get_xy(now_e, now_n, angle)
+        
+    def gps_listener_callback(self, data):
+        # if self.first_gps == (-1,-1):
+        #     self.first_gps = (data.latitude, data.longtitude)
+        # self.now_gps = (data.latitude, data.longitude)
+        self.now_gps = (35.2322266999725, 129.0793471249975)
+        now_e, now_n, _ = pm.geodetic2enu(self.now_gps[0], self.now_gps[1], 0, self.stadium_gps[0][0], self.stadium_gps[0][1], 0)
+        now_e, now_n = self.get_xy(now_e, now_n, self.angle)
         now_enu = [now_e, now_n]
+            ### 회전변환 코드 짜서 직사각형 좌표계 만들기~
         
         self.e_index = int(np.floor(now_e*2))
         self.n_index = int(np.floor(now_n*2))
@@ -191,34 +208,7 @@ class Autonomous(Node):
         self.curr_y_publish.publish(msg_y)
         
         self.now_position = "x"+ str(self.e_index) + "y" + str(self.n_index)
-        self.dstarlite()
-        
-    '''    
-    # def gps_listener_callback(self, data):
-    #     if self.first_gps == (-1,-1):
-    #         self.first_gps = (data.latitude, data.longtitude)
-    #     self.now_gps = (data.latitude, data.longitude)
-    #     self.now_gps = (35.23224100, 129.07931000)
-    #     stadium_gps = [(35.2323047, 129.0793592),(35.23218089999, 129.0792796),(35.2321492999,129.0793337), (35.2322719,129.07941599999)]
-    #     stadium_enu = [[0, 0]]
-    #     angle = -10000
-    #     for value in stadium_gps[1:]:
-    #         e, n, _ = pm.geodetic2enu(value[0], value[1], 0, stadium_gps[0][0], stadium_gps[0][1], 0)
-    #         if angle == -10000:
-    #             angle = math.atan2(n,e)
-    #         e, n = self.get_xy(e, n, angle)
-    #         stadium_enu.append([e, n])
-            
-    #     now_e, now_n, _ = pm.geodetic2enu(self.now_gps[0], self.now_gps[1], 0, stadium_gps[0][0], stadium_gps[0][1], 0)
-    #     now_e, now_n = self.get_xy(now_e, now_n, angle)
-    #     now_enu = [now_e, now_n]
-    #         ### 회전변환 코드 짜서 직사각형 좌표계 만들기~
-        
-    #     self.e_index = np.floor(now_e*2)
-    #     self.n_index = np.floor(now_n*2)
-    #     self.now_position = "x"+ str(self.e_index) + "y" + str(self.n_index)
-    '''
-            
+        self.now_position = "x30y30"
     # --------------------------------------------------------------------------- #
     
     def init_function(self):
@@ -228,7 +218,7 @@ class Autonomous(Node):
         #     self.obstacle.append((i,48))
         # for i in range(4,67):
         #     self.obstacle.append((i,36))
-        self.s_start = 'x13y5' ## -> 
+        self.s_start = 'x30y30' ## -> 
         self.s_goal = self.s_goals[0]
         self.graph.goal = self.s_goal
         self.goal_coords = stateNameToCoords(self.s_goal)

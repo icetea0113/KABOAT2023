@@ -20,6 +20,7 @@ namespace ublox_node {
 //
 RawDataProduct::RawDataProduct(uint16_t nav_rate, uint16_t meas_rate, std::shared_ptr<diagnostic_updater::Updater> updater, rclcpp::Node* node)
   : nav_rate_(nav_rate), meas_rate_(meas_rate), updater_(updater), node_(node) {
+     std::cout << nav_rate_ <<", " << meas_rate_ << std::endl;
   if (getRosBoolean(node_, "publish.rxm.raw")) {
     rxm_raw_pub_ = node_->create_publisher<ublox_msgs::msg::RxmRAW>("rxmraw", 1);
   }

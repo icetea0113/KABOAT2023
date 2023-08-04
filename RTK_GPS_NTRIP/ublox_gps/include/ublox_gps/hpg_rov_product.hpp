@@ -21,7 +21,7 @@ class HpgRovProduct final : public virtual ComponentInterface {
  public:
   // Constants for diagnostic updater
   //! Diagnostic updater: RTCM topic frequency min [Hz]
-  const double kRtcmFreqMin = 1;
+  const double kRtcmFreqMin = 4;
   //! Diagnostic updater: RTCM topic frequency max [Hz]
   const double kRtcmFreqMax = 10;
   //! Diagnostic updater: RTCM topic frequency tolerance [%]

@@ -37,6 +37,9 @@
 #include <stdexcept>
 #include <vector>
 
+#include <iostream>
+//#include <source_location>
+
 #include <rclcpp/rclcpp.hpp>
 
 // Other u-blox packages
@@ -207,7 +210,7 @@ class Gps final {
    * receiver in number measurement cycles
    * @return true on ACK, false on other conditions.
    */
-  bool configRate(uint16_t meas_rate, uint16_t nav_rate);
+  bool configRate(uint16_t meas_rate, uint16_t nav_rate );//, const std::source_location &location = std::source_location::current());
 
   /**
    * @brief Configure the RTCM messages with the given IDs to the set rate.

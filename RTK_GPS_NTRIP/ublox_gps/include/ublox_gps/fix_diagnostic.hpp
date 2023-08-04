@@ -25,6 +25,7 @@ public:
                          double stamp_min, uint16_t nav_rate, uint16_t meas_rate,
                          std::shared_ptr<diagnostic_updater::Updater> updater) {
     const double target_freq = 1.0 / (meas_rate * 1e-3 * nav_rate); // Hz
+     std::cout << target_freq<< std::endl;
     min_freq = target_freq;
     max_freq = target_freq;
     diagnostic_updater::FrequencyStatusParam freq_param(&min_freq, &max_freq,
