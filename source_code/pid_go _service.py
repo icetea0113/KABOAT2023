@@ -123,7 +123,13 @@ class MotorControlNode(Node):
         y, x = self.get_xy(e,n)
         self.current_position = y
 
-
+        data_filtered = self.moving_average_filter([y,x],5)
+        y_dot= data_filtered[0]
+        x_dot = data_filtered[1]
+        print("x_filtered : ",x_dot,"  y_filtered : ",y_dot)
+        
+        plt.close()
+        plt.ion()
         fig, ax = plt.subplots()
         ax.plot(y, x, 'o')  # 'o' for dot-like markers, you can change to '-' for line
         ax.set_xlabel('Y')
@@ -163,8 +169,30 @@ class MotorControlNode(Node):
         
         throttle.pulse_width = int(right_percentage)
         self.set_throttle_handler_right.call_async(throttle)
+    
+    def moving_average_filter(self,data,window_size):
+        #filtered_data = []
+    
+        if len(self.window) < window_size:
+            self.window.append(data)
+            return [0.0] * len(data)
+        else:
+            self.window.pop(0)
+            self.window.append(data)
+                    
+        filtered_data = [sum(col) / len(col) for col in zip(*self.window)]
+        return filtered_data
+        
+    def stop_motors(self):
+        # 모터를 정지시키는 코드
+        throttle = ThrottlePercentage.Request()
+        throttle.percentage = 0
+        self.set_throttle_handler_left.call_async(throttle)
+        self.set_throttle_handler_right.call_async(throttle)
 
-       
+    def destroy_node(self):
+        self.stop_motors()  # 모터 정지 메서드 호출
+        super().destroy_node()       
     
 def main(args=None):
     rclpy.init(args=args)
