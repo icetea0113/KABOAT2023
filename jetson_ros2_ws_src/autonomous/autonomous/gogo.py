@@ -114,11 +114,12 @@ class Autonomous(Node):
             e, n = self.get_xy(e, n, self.angle)
             self.s_goals.append("x"+str(e)+"y"+str(n))
     
-        self.now_position = "x30y30"
+        self.now_position = ""
         # subscriber 선언
         self.gps_subscription = self.create_subscription(NavSatFix, "/fix", self.gps_listener_callback, qos_profile)
         self.yaw_subcription = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
         
+        self.led_service = self.create_client(RGBColor, "/rgbled/set")
         self.scan_subscription = self.create_subscription(LaserScan, "/scan", self.listener_callback, qos_profile)
         self.queue_publish = self.create_publisher(Load, "load", qos_profile)
         self.image_detect = self.create_subscription(Goal, "goal", self.image_detect_callback, qos_profile)
@@ -209,19 +210,24 @@ class Autonomous(Node):
         self.msg_queue.curr_y = self.n_index
         
         self.now_position = "x"+ str(self.e_index) + "y" + str(self.n_index)
-        self.now_position = "x30y30"
+        # self.now_position = "x30y30"
         if self.init_state == False:
             self.init_function()
             self.init_state = True
     # --------------------------------------------------------------------------- #
     
     def init_function(self):
+        led_color = RGBColor.Request()
+        led_color.red = 255
+        led_color.green = 255
+        self.let_service.call_async(led_color)
         global VIEWING_RANGE
+
         for i in range(72):
             self.obstacle.append((i,22))
             self.obstacle.append((i,50))
 
-        self.s_start = 'x30y30' ## -> 
+        self.s_start = "x" + str(self.first_gps[0]) + "y" + str(self.first_gps[1])
         self.s_goal = self.s_goals[0]
         self.graph.goal = self.s_goal
         self.goal_coords = stateNameToCoords(self.s_goal)
@@ -265,7 +271,14 @@ class Autonomous(Node):
             self.goal_coords = stateNameToCoords(self.s_goal)
             self.graph.goal_coords = self.goal_coords
             self.graph.setStart(self.s_current)
-            self.graph.setGoal(self.s_goal)   
+            self.graph.setGoal(self.s_goal)
+
+            led_color = RGBColor.Request()
+            led_color.red = 255
+            led_color.green = 255
+            led_color.blue = 255
+            self.let_service.call_async(led_color)
+
             if len(self.s_goals) == 0:
             #     self.graph.cells[item[0]][item[1]] = -1
                 done = True
