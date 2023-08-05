@@ -4,7 +4,7 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, qos_pr
 from rclpy.parameter import Parameter
 from sensor_msgs.msg import NavSatFix
 import math
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Int8MultyArray
 from simple_pid import PID
 import pymap3d as pm
 #import numpy as np
@@ -33,7 +33,7 @@ class MotorControlNode(Node):
         
         self.subscription2 = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
         self.subscription2   
-        
+        self.subscription3 = self.create_subscription(Int8MultiArray, "list_load", self.node_listener_callback, qos_profile)
         self.subscription3 = self.create_subscription(Load, "load", self.node_listener_callback, qos_profile)
         self.subscription3
         
