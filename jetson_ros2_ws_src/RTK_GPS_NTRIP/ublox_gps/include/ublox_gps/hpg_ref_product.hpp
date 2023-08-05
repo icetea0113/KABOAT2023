@@ -22,7 +22,7 @@ namespace ublox_node {
 class HpgRefProduct: public virtual ComponentInterface {
  public:
   //! Default measurement period for HPG devices
-  constexpr static uint16_t kDefaultMeasPeriod = 200;
+  constexpr static uint16_t kDefaultMeasPeriod = 250;
 
   explicit HpgRefProduct(uint16_t nav_rate, uint16_t meas_rate, std::shared_ptr<diagnostic_updater::Updater> updater, std::vector<ublox_gps::Rtcm> rtcms, rclcpp::Node* node);
 

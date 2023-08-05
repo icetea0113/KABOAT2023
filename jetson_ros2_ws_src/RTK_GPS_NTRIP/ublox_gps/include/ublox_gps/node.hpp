@@ -84,18 +84,18 @@ class UbloxNode final : public rclcpp::Node {
   //! How long to wait during I/O reset [s]
   constexpr static int kResetWait = 10;
   //! How often (in seconds) to send keep-alive message
-  constexpr static double kKeepAlivePeriod = 10.0;
+  constexpr static double kKeepAlivePeriod = 5;
   //! How often (in seconds) to call poll messages
-  constexpr static double kPollDuration = 1.0;
+  constexpr static double kPollDuration = 5;
   // Constants used for diagnostic frequency updater
   //! [s] 5Hz diagnostic period
-  const float kDiagnosticPeriod = 0.2;
+  const float kDiagnosticPeriod = 0.1;
   //! Tolerance for Fix topic frequency as percentage of target frequency
-  const double kFixFreqTol = 0.15;
+  const double kFixFreqTol = 0.05;
   //! Window [num messages] for Fix Frequency Diagnostic
-  const double kFixFreqWindow = 10;
+  const double kFixFreqWindow = 4;
   //! Minimum Time Stamp Status for fix frequency diagnostic
-  const double kTimeStampStatusMin = 0;
+  const double kTimeStampStatusMin = 4;
 
   /**
    * @brief Initialize and run the u-blox node.

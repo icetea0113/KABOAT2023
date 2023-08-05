@@ -36,7 +36,7 @@ UbloxFirmware6::UbloxFirmware6(const std::string & frame_id, std::shared_ptr<dia
   }
 
   fix_pub_ =
-    node_->create_publisher<sensor_msgs::msg::NavSatFix>("fix", 1);
+    node_->create_publisher<sensor_msgs::msg::NavSatFix>("fix", 10);
 
   if (getRosBoolean(node_, "publish.nav.velned")) {
     nav_vel_ned_pub_ =
