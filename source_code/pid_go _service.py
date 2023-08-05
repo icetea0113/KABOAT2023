@@ -56,12 +56,12 @@ class MotorControlNode(Node):
         self.motor_pid = PID(700.0/3, 0, 0)# 1.5m를 기준으로 350설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
         self.motor_pid.output_limits = (-100, 350) # 출력 범위 제한
         self.current_position = None
-        self.target_position = 6.0 # 수정
+        self.target_position = 4.0 # 수정
         
         self.angle_pid = PID(5.0/9, 0, 0.05)# 180기준 100
-        self.angle_pid.output_limits = (-500, 500) # 출력 범위 제한(임의)
+        self.angle_pid.output_limits = (-100, 100) # 출력 범위 제한(임의)
         self.current_angle = None
-        self.target_angle = None  
+        self.target_angle = 90  
 
         self.pid_status = 3 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid
 
@@ -99,23 +99,53 @@ class MotorControlNode(Node):
         
         self.go_straight(motor_speed)
         
-        if(abs(self.current_position-self.target_position)<0.1):# error 정의하기
-            self.pid_status=0
-            self.before_go = self.go
-            self.current_position = None
-            self.huzin_mode = 0
+        #if(abs(self.current_position-self.target_position)<0.1):# error 정의하기
+        #    self.pid_status=0
+        #    self.before_go = self.go
+        #    self.current_position = None
+        #    self.huzin_mode = 0
             
-            #pid 다 썼으면 초기화 해두기
-            self.motor_pid = PID(30, 0, 0.05)# 3.3m를 기준으로 설계
-            self.motor_pid.output_limits = (0, 100)
-            self.angle_pid = PID(1.0/3, 0, 0.05)# 3.3m를 기준으로 설계
-            self.angle_pid.output_limits = (0, 60) # 출력 범위 제한(임의)                    
+        #    #pid 다 썼으면 초기화 해두기
+        #    self.motor_pid = PID(30, 0, 0.05)# 3.3m를 기준으로 설계
+        #    self.motor_pid.output_limits = (0, 100)
+        #    self.angle_pid = PID(1.0/3, 0, 0.05)# 3.3m를 기준으로 설계
+        #    self.angle_pid.output_limits = (0, 60) # 출력 범위 제한(임의)
+                                
+    def pid_angle(self):
+        #시계방향으로 돌릴지 반시계방향으로 돌릴지 판단 코드
+        #시작 각도와 목표 각도 잡고 pid 제어
+        #모터를 반대 방향으로 같은 크기로 돌리는데 그 크기를 각도 오차를 통해서 pid 제어
+        #이때는 비례상수가 최대 차이 180도 일 때 임의의 같은 출력(ex 60출력) -> 비례상수 1/3수준으로 지정
+
+
+        error = self.angle_difference(self.now_heading, self.target_angle)    
+        self.angle_pid.setpoint = 0
+        
+        current_time = time.time()
+        dt = current_time - self.last_time
            
+        #error가 양수이면 시계방향 회전, 음수이면 반시계방향 회전                
+        motor_speed = self.angle_pid(error, dt)
+        self.last_time = current_time
+        
+        self.turn_angle(motor_speed,1)
+        
+        #if(error>0):
+        #    self.turn_angle(motor_speed,1)
+        #else:
+        #    self.turn_anlge(motor_speed,2)
+            
+        #if(error<3.0):# error 정의하기
+        #    self.pid_status=2
+            #1초나 2초 기다리는 코드 추가할까?       
 
     #누적 오차로 예상 이외의 점으로 가는거 괜찮나? # 오차도 어느 범위 왔을 때 멈출지랑 들어왔을 때 조금 그 값으로 수렴하게 시간을 더 줄 수도 있다.
     
     def heading_listener_callback(self, data):
         self.now_heading = data.yaw
+        
+        if(self.pid_status == 1):               
+            self.pid_angle()        
 
     def gps_listener_callback(self, gps):
 
@@ -123,24 +153,12 @@ class MotorControlNode(Node):
         y, x = self.get_xy(e,n)
         self.current_position = y
 
-        data_filtered = self.moving_average_filter([y,x],5)
+        data_filtered = self.moving_average_filter([y,x],3)
         y_dot= data_filtered[0]
         x_dot = data_filtered[1]
         print("x_filtered : ",x_dot,"  y_filtered : ",y_dot)
-        
-        plt.close()
-        plt.ion()
-        fig, ax = plt.subplots()
-        ax.plot(y, x, 'o')  # 'o' for dot-like markers, you can change to '-' for line
-        ax.set_xlabel('Y')
-        ax.set_ylabel('X')
-        ax.set_title('GPS Data in Local Coordinate')
-        ax.grid(True)
-        ax.set_xlim([0, 10])
-        ax.set_ylim([0, 20])
-        ax.text(x, y, f'({x}, {y})')
+        print("x : ",x,"  y : ",y) 
 
-        plt.show()
 
         if(self.pid_status ==2):
             self.pid_distance(y,x)
@@ -158,7 +176,8 @@ class MotorControlNode(Node):
     def angle_difference(a, b):
         diff = (b - a + 180) % 360 - 180
         return diff
-    
+
+
     def go_straight(self,percentage):# 음수로 역회전을 하는건가?
         throttle = ThrottlePulseWidth.Request()
         left_percentage= percentage + 1500
@@ -169,6 +188,25 @@ class MotorControlNode(Node):
         
         throttle.pulse_width = int(right_percentage)
         self.set_throttle_handler_right.call_async(throttle)
+
+    def turn_angle(self,percentage,direction):# 음수로 역회전을 하는건가?
+        throttle = ThrottlePulseWidth.Request()
+
+        left_pulse_width = percentage*-1
+        right_pulse_width = percentage 
+        
+        #if(direction == 2):
+        #    left_pulse_width *= -1            
+        #    right_pulse_width *= -1
+        
+        left_pulse_width += 1500
+        right_pulse_width +=1500
+                    
+        throttle.pulse_width = int(left_pulse_width)
+        self.set_throttle_handler_left.call_async(throttle)
+        
+        throttle.pulse_width = int(right_pulse_width)
+        self.set_throttle_handler_right.call_async(throttle)   
     
     def moving_average_filter(self,data,window_size):
         #filtered_data = []
