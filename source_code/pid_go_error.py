@@ -120,6 +120,8 @@ class MotorControlNode(Node):
         if(self.pid_status == 1):               
             self.pid_angle() 
         print(self.pid_status)
+        if(self.pid_status == 3):               
+            self.go_temp()
 	
     def gps_listener_callback(self, gps):
 
@@ -232,6 +234,12 @@ class MotorControlNode(Node):
         self.set_throttle_handler_left.call_async(throttle)
         
         throttle.pulse_width = int(right_pulse_width)
+        self.set_throttle_handler_right.call_async(throttle)
+        
+    def go_temp(self):
+        throttle = ThrottlePulseWidth.Request()
+        throttle.pulse_width = 1600
+        self.set_throttle_handler_left.call_async(throttle)
         self.set_throttle_handler_right.call_async(throttle)
         
 
