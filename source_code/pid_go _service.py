@@ -57,11 +57,16 @@ class MotorControlNode(Node):
         self.motor_pid.output_limits = (-100, 350) # 출력 범위 제한
         self.current_position = None
         self.target_position = 4.0 # 수정
+        self.window = []
         
-        self.angle_pid = PID(5.0/9, 0, 0.05)# 180기준 100
-        self.angle_pid.output_limits = (-100, 100) # 출력 범위 제한(임의)
+        self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
+        self.angle_pid.output_limits = (-200, 200) # 출력 범위 제한(임의)
         self.current_angle = None
-        self.target_angle = 90  
+        self.target_angle = 90.0  
+
+        self.go_pid = PID(2,0,0) #10도에 20 정도 더 주는 정도
+        self.go_pid.output_limits = (-100, 100)
+  
 
         self.pid_status = 3 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid
 
@@ -118,7 +123,7 @@ class MotorControlNode(Node):
         #이때는 비례상수가 최대 차이 180도 일 때 임의의 같은 출력(ex 60출력) -> 비례상수 1/3수준으로 지정
 
 
-        error = self.angle_difference(self.now_heading, self.target_angle)    
+        error = self.angle_difference(self.target_angle,self.now_heading)      
         self.angle_pid.setpoint = 0
         
         current_time = time.time()
@@ -145,7 +150,9 @@ class MotorControlNode(Node):
         self.now_heading = data.yaw
         
         if(self.pid_status == 1):               
-            self.pid_angle()        
+            self.pid_angle()
+        if(self.pid_status == 3):               
+            self.go_temp()                
 
     def gps_listener_callback(self, gps):
 
@@ -177,8 +184,22 @@ class MotorControlNode(Node):
         diff = (b - a + 180) % 360 - 180
         return diff
 
-
-    def go_straight(self,percentage):# 음수로 역회전을 하는건가?
+    def go_temp(self):
+        
+        error = self.angle_difference(self.target_angle,self.now_heading)    
+        self.go_pid.setpoint = 0
+        motor_speed = self.go_pid(error)
+        
+        throttle = ThrottlePulseWidth.Request()
+        throttle.pulse_width = 1650
+        
+        self.set_throttle_handler_left.call_async(throttle)
+        throttle.pulse_width = 1650 + int(motor_speed)
+        
+        self.set_throttle_handler_right.call_async(throttle)
+    
+    
+    def go_straight(self,percentage):
         throttle = ThrottlePulseWidth.Request()
         left_percentage= percentage + 1500
         right_percentage= percentage + 1500
@@ -189,24 +210,35 @@ class MotorControlNode(Node):
         throttle.pulse_width = int(right_percentage)
         self.set_throttle_handler_right.call_async(throttle)
 
-    def turn_angle(self,percentage,direction):# 음수로 역회전을 하는건가?
+    def turn_angle(self,percentage,direction):
         throttle = ThrottlePulseWidth.Request()
-
+        if percentage < 80 and percentage>30:
+            percentage =80
+        if (percentage < -30) and (percentage >-80):
+            percentage = -80
+        if 30 > percentage > -30:
+            percentage = 0
+            throttle.pulse_width = 1500
+            self.set_throttle_handler_left.call_async(throttle)
+            self.set_throttle_handler_right.call_async(throttle)
+            self.pid_status = 3
+            return
+        print(percentage)
         left_pulse_width = percentage*-1
         right_pulse_width = percentage 
         
         #if(direction == 2):
         #    left_pulse_width *= -1            
         #    right_pulse_width *= -1
-        
+        #print("left",left_pulse_width,"right",right_pulse_width)
         left_pulse_width += 1500
         right_pulse_width +=1500
-                    
+        print(left_pulse_width, right_pulse_width)
         throttle.pulse_width = int(left_pulse_width)
         self.set_throttle_handler_left.call_async(throttle)
         
         throttle.pulse_width = int(right_pulse_width)
-        self.set_throttle_handler_right.call_async(throttle)   
+        self.set_throttle_handler_right.call_async(throttle)
     
     def moving_average_filter(self,data,window_size):
         #filtered_data = []
