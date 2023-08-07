@@ -53,10 +53,10 @@ class MotorControlNode(Node):
 
              
         
-        self.motor_pid = PID(300.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
-        self.motor_pid.output_limits = (-80, 350) # 출력 범위 제한
+        self.motor_pid = PID(200.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
+        self.motor_pid.output_limits = (-80, 200) # 출력 범위 제한
         self.current_position = None
-        self.target_position = 6.0 # 수정
+        self.target_position = 6 # 수정
         self.window = []
         
         self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
@@ -64,8 +64,8 @@ class MotorControlNode(Node):
         self.current_angle = None
         self.target_angle = 0
 
-        self.go_pid = PID(2,0,0) #10도에 20 정도 더 주는 정도
-        self.go_pid.output_limits = (-100, 100)
+        self.go_pid = PID(10,0,9) #10도에 20 정도 더 주는 정도
+        self.go_pid.output_limits = (-200, 200)
   
 
         self.pid_status = 2 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid 3 : 직진하면서 각도 각도 제어
@@ -159,7 +159,7 @@ class MotorControlNode(Node):
             self.pid_angle()
         if(self.pid_status == 3):               
             self.go_temp()                
-        print(self.now_heading)
+        #print(self.now_heading)
        # print(self.pid_status)
     def gps_listener_callback(self, gps):
 
@@ -230,7 +230,7 @@ class MotorControlNode(Node):
             #self.pid_status = 4
             #print(self.pid_status)
             #return
-        if 35 >percentage> -15 :
+        if 10 >percentage> -15 :
             percentage=0
             self.pid_status = 1
             self.target_angle = 90
@@ -240,7 +240,7 @@ class MotorControlNode(Node):
 
         if -80 < percentage < -15:
             percentage = -80   
-        if 70 > percentage >35: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
+        if 70 > percentage >10: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
             percentage = 0
            # self.pid_status = 4 # 연습할 때 pid _status 1으로 두고 90꺽는거 보기 그리고  다시 status 3으로 바꿔서 90도 일치 시키면서 도는거 
         #if -10 > percentage >-30:
@@ -258,12 +258,12 @@ class MotorControlNode(Node):
         
         if(motor_speed>0):
             right_percentage= percentage + 1500 + motor_speed
-            left_percentage= percentage + 1500
+            left_percentage= percentage + 1500 - motor_speed
         else:
-            right_percentage= percentage + 1500
+            right_percentage= percentage + 1500 +motor_speed
             left_percentage= percentage + 1500 - motor_speed
         #### 추가 끝
-
+        print(left_percentage, right_percentage)
         
         throttle.pulse_width = int(left_percentage)
         self.set_throttle_handler_left.call_async(throttle)
@@ -294,7 +294,7 @@ class MotorControlNode(Node):
         #print("left",left_pulse_width,"right",right_pulse_width)
         left_pulse_width += 1500
         right_pulse_width +=1500
-        print(left_pulse_width, right_pulse_width)
+        #print(left_pulse_width, right_pulse_width)
         throttle.pulse_width = int(left_pulse_width)
         self.set_throttle_handler_left.call_async(throttle)
         
