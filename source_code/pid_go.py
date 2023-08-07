@@ -46,17 +46,17 @@ class MotorControlNode(Node):
             ThrottlePulseWidth, "/actuators/throttle/set_pulse_width_right"
         )
 
-        self.origin =[35.2323084,129.0792833,0]
-        self.right_end=  [35.232304, 129.0792801, 0]
+        self.origin =[35.0690982,128.6296551,0]
+        self.right_end=  [35.0691024, 128.6297418, 0]
         self.right_end_x, self.right_end_y = self.gps_enu_converter(self.right_end)
         self.angle = math.atan2(self.right_end_y,self.right_end_x) #radianv
 
              
         
-        self.motor_pid = PID(700.0/3, 0, 0)# 1.5m를 기준으로 350설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
-        self.motor_pid.output_limits = (-100, 350) # 출력 범위 제한
+        self.motor_pid = PID(300.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
+        self.motor_pid.output_limits = (-80, 350) # 출력 범위 제한
         self.current_position = None
-        self.target_position = 4.0 # 수정
+        self.target_position = 6.0 # 수정
         self.window = []
         
         self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
@@ -68,7 +68,7 @@ class MotorControlNode(Node):
         self.go_pid.output_limits = (-100, 100)
   
 
-        self.pid_status = 4 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid
+        self.pid_status = 2 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid
 
         self.now_heading = 0.0
         #pid 시작할 때 방향과 갯수
@@ -148,7 +148,13 @@ class MotorControlNode(Node):
     
     def heading_listener_callback(self, data):
         self.now_heading = round(data.rel_yaw,2)
-        
+        if(self.pid_status == 4):
+            trottle = ThrottlePulseWidth.Request()
+            trottle.pulse_width = 1500
+            self.set_throttle_handler_left.call_async(throttle)
+            self.set_throttle_handler_right.call_async(throttle)
+
+
         if(self.pid_status == 1):               
             self.pid_angle()
         if(self.pid_status == 3):               
@@ -201,13 +207,21 @@ class MotorControlNode(Node):
     
     def go_straight(self,percentage):
         throttle = ThrottlePulseWidth.Request()
-        if percentage < 80 and percentage>50:
+        if percentage < 80 and percentage>70:
             percentage =80
-        if (percentage < -50) and (percentage >-80):
-            percentage = -80
-        if 50 > percentage > -50: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
+        #if (percentage < 35) and (percentage >-80):
+            #self.pid_status = 4
+            #print(self.pid_status)
+            #return
+        if 35 >percentage> -15 :
+            percentage=0
+        if -80 < percentage < -15:
+            percentage = -80   
+        if 70 > percentage >35: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
             percentage = 0
-            self.pid_status = 4 # 연습할 때 pid _status 1으로 두고 90꺽는거 보기 그리고  다시 status 3으로 바꿔서 90도 일치 시키면서 도는거 
+           # self.pid_status = 4 # 연습할 때 pid _status 1으로 두고 90꺽는거 보기 그리고  다시 status 3으로 바꿔서 90도 일치 시키면서 도는거 
+        #if -10 > percentage >-30:
+         #   percentage = -80
         left_percentage= percentage + 1500
         right_percentage= percentage + 1500
         
