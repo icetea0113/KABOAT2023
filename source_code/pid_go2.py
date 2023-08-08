@@ -47,6 +47,11 @@ class MotorControlNode(Node):
             ThrottlePulseWidth, "/actuators/throttle/set_pulse_width_right"
         )
 
+        self.origin = [35.2318379999, 129.0825561, 0.0]
+        self.right_end= [35.2319094,129.0825094,0.0]
+        self.right_end_x, self.right_end_y = self.gps_enu_converter(self.right_end)
+        self.angle = math.atan2(self.right_end_y,self.right_end_x) #radianv
+
         self.motor_pid = PID(200.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
         self.motor_pid.output_limits = (-80, 200) # 출력 범위 제한
         self.current_position = None
