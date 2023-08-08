@@ -94,13 +94,13 @@ class MotorControlNode(Node):
         #목표 지점 정하기 (한번만 하면 돼서, 수정해주면 좋을 거 같다), status가 0에서 1로 바뀌며 go, num 넘겨 줄 때 같이 해주면 될듯
         if(self.current_position == None):
             if(self.go == 1):
-                self.target_position = y + self.num
-            elif(self.go == 4):
-                self.target_position = y - self.num
+                self.target_position = math.floor(x) + self.num
             elif(self.go == 2):
-                self.target_position = x + self.num
+                self.target_position = math.floor(y) + self.num
             elif(self.go == 3):
-                self.target_position = x - self.num
+                self.target_position = math.floor(x) - self.num
+            elif(self.go == 4):
+                self.target_position = math.floor(y) - self.num
             
         if(self.go ==1 or self.go == 4):
             self.current_position = y
@@ -177,8 +177,11 @@ class MotorControlNode(Node):
                 self.target_angle = 180
 
             self.pid_status = 1       
-            self.huzin_mode = 1
+            self.huzin_mode = 0
             #pid 제어 초기화 넣기 
+
+            if self.num > 12:
+                self.num=12
 
             self.motor_pid = PID(200.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
             self.motor_pid.output_limits = (-80, 200) # 출력 범위 제한   
