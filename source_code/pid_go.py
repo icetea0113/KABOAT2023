@@ -54,22 +54,27 @@ class MotorControlNode(Node):
 
              
         
-        self.motor_pid = PID(220.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
-        self.motor_pid.output_limits = (-80, 220) # 출력 범위 제한
+        self.motor_pid = PID(200.0/3, 0,50)# 1.5m를 기준으로 100설계, D항은 실험을 통해 0으로 시작하여 점차 늘리며 거리별로 계산해둔다.
+        self.motor_pid.output_limits = (-80, 200) # 출력 범위 제한
         self.current_position = None
-        self.target_position = 2.2 # 수정
+        self.target_position = 1.8 # 수정
         self.window = []
         
-        self.angle_pid = PID(15.0/9, 0, 0.05)# 180기준 300
-        self.angle_pid.output_limits = (-300, 300) # 출력 범위 제한(임의)
+        self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
+        self.angle_pid.output_limits = (-200, 200) # 출력 범위 제한(임의)
         self.current_angle = None
-        self.target_angle = 0
+        self.target_angle = 90
+
+        # 추가, 수정필요
+        self.target_angle2 = 0
+        self.target_x = 2
+        self.target_y = 20
 
         self.go_pid = PID(4,0,2) #10도에 20 정도 더 주는 정도
         self.go_pid.output_limits = (-200, 200)
   
 
-        self.pid_status = 4 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid 3 : 직진하면서 각도 각도 제어
+        self.pid_status = 2 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid 3 : 직진하면서 각도 각도 제어
 
         self.now_heading = 0.0
         #pid 시작할 때 방향과 갯수
@@ -168,9 +173,8 @@ class MotorControlNode(Node):
         y, x = self.get_xy(e,n)
         self.current_position = x
 
-        data_filtered = self.moving_average_filter([y,x],3)
-        y_dot= data_filtered[0]
-        x_dot = data_filtered[1]
+        self.target_angle2 = math.atan2((self.target_x-x),(self.target_y-y))
+
         #print("x_filtered : ",x_dot,"  y_filtered : ",y_dot)
         print("x : ",x,"  y : ",y) 
 
@@ -228,7 +232,7 @@ class MotorControlNode(Node):
     
     def go_straight(self,percentage):
         throttle = ThrottlePulseWidth.Request()
-        if percentage < 80 and percentage>60:
+        if percentage < 80 and percentage>70:
             percentage =80
         #if (percentage < 35) and (percentage >-80):
             #self.pid_status = 4
@@ -238,13 +242,13 @@ class MotorControlNode(Node):
             percentage=0
             self.pid_status = 1
             self.target_angle = -90
-
-            self.go_pid = PID(2,0,0) #10도에 20 정도 더 주는 정도
-            self.go_pid.output_limits = (-100, 100)
+            self.target_angle = 0
+            self.go_pid = PID(4,0,2) #10도에 20 정도 더 주는 정도
+            self.go_pid.output_limits = (-200, 200)
 
         if -80 < percentage < -15:
             percentage = -80   
-        if 60 > percentage >30: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
+        if 70 > percentage >30: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
             percentage = 0
            # self.pid_status = 4 # 연습할 때 pid _status 1으로 두고 90꺽는거 보기 그리고  다시 status 3으로 바꿔서 90도 일치 시키면서 도는거 
         #if -10 > percentage >-30:
@@ -277,7 +281,7 @@ class MotorControlNode(Node):
 
     def turn_angle(self,percentage,direction):
         throttle = ThrottlePulseWidth.Request()
-        if percentage < 80 and percentage>30:
+        if percentage < 80 and percentage>20:
             percentage =80
         if (percentage < -30) and (percentage >-80):
             percentage = -80
