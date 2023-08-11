@@ -47,8 +47,8 @@ class MotorControlNode(Node):
             ThrottlePulseWidth, "/actuators/throttle/set_pulse_width_right"
         )
 
-        self.origin = [35.2318379999, 129.0825561, 0.0]
-        self.right_end= [35.2319094,129.0825094,0.0]
+        self.origin = [35.0696588, 128.5788018, 0.0]
+        self.right_end= [35.0693591,128.5789238,0.0]
         self.right_end_x, self.right_end_y = self.gps_enu_converter(self.right_end)
         self.angle = math.atan2(self.right_end_y,self.right_end_x) #radianv
 
@@ -63,7 +63,7 @@ class MotorControlNode(Node):
         self.current_angle = None
         self.target_angle = 0
 
-        self.go_pid = PID(4,0,3) #10도에 20 정도 더 주는 정도
+        self.go_pid = PID(8,0,4) #10도에 20 정도 더 주는 정도
         self.go_pid.output_limits = (-200, 200)
   
 
@@ -94,13 +94,13 @@ class MotorControlNode(Node):
         #목표 지점 정하기 (한번만 하면 돼서, 수정해주면 좋을 거 같다), status가 0에서 1로 바뀌며 go, num 넘겨 줄 때 같이 해주면 될듯
         if(self.current_position == None):
             if(self.go == 1):
-                self.target_position = math.round(x) + self.num
+                self.target_position = math.round(x) + self.num*0.5
             elif(self.go == 2):
-                self.target_position = math.round(y) + self.num
-            elif(self.go == 3):
-                self.target_position = math.round(x) - self.num
+                self.target_position = math.round(y) + self.num*0.5
+            elif(self.go == 3):*0.5
+                self.target_position = math.round(x) - self.num*0.5
             elif(self.go == 4):
-                self.target_position = math.round(y) - self.num
+                self.target_position = math.round(y) - self.num*0.5
             
         if(self.go ==1 or self.go == 4):
             self.current_position = y
@@ -154,7 +154,8 @@ class MotorControlNode(Node):
     def gps_listener_callback(self, gps):
         e, n= self.gps_enu_converter([gps.latitude, gps.longitude, gps.altitude])
         y, x = self.get_xy(e,n)# 경기장 위쪽을 y로 하겠다.
-
+        #y=y+4
+        #x=x+4
         if(self.pid_status ==2):
             self.pid_distance(y,x)
     
@@ -166,7 +167,7 @@ class MotorControlNode(Node):
                 self.go = self.list_load[i]
                 self.num +=1
                 i +=1
-
+            print("num :  ",self.num,"go :  ",self.go)
             if self.go == 1:
                 self.target_angle = 90 #  정수 or 실수?
             elif self.go == 2:
@@ -189,7 +190,7 @@ class MotorControlNode(Node):
             self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
             self.angle_pid.output_limits = (-200, 200) # 출력 범위 제한(임의)
 
-            self.go_pid = PID(4,0,2) #10도에 20 정도 더 주는 정도
+            self.go_pid = PID(8,0,4) #10도에 20 정도 더 주는 정도
             self.go_pid.output_limits = (-200, 200)         
 
             # 거리 멀 때랑(급정거 넣을지) 0.5m일 때 \
@@ -257,11 +258,11 @@ class MotorControlNode(Node):
     def turn_angle(self,percentage):# 음수로 역회전을 하는건가?
 
         throttle = ThrottlePulseWidth.Request()
-        if percentage < 80 and percentage>30:
+        if percentage < 80 and percentage>20:
             percentage =80
-        if (percentage < -30) and (percentage >-80):
+        if (percentage < -20) and (percentage >-80):
             percentage = -80
-        if 30 > percentage > -30:
+        if 20 > percentage > -20:
             percentage = 0
             throttle.pulse_width = 1500
             self.set_throttle_handler_left.call_async(throttle)
