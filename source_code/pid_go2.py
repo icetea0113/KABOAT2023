@@ -10,7 +10,7 @@ import pymap3d as pm
 import time
 #import numpy as np
 #from queue import Queue
-from mechaship_interfaces.msg import  RelHeading
+from mechaship_interfaces.msg import  RelHeading, Load
 from mechaship_interfaces.srv import  ThrottlePulseWidth
 #from filterpy.kalman import KalmanFilter
 
@@ -34,8 +34,8 @@ class MotorControlNode(Node):
         self.subscription2 = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
         self.subscription2   
         
-        #self.subscription3 = self.create_subscription( ~, "~", self.node_listener_callback, qos_profile)
-        #self.subscription3
+        self.subscription3 = self.create_subscription(Load , "load", self.node_listener_callback, qos_profile)
+        self.subscription3
 
         
         
@@ -218,13 +218,13 @@ class MotorControlNode(Node):
         throttle = ThrottlePulseWidth.Request()
         if percentage < 80 and percentage>70:
             percentage =80
-        if 70 > percentage >10: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
+        if 70 > percentage >30: # 50을 내는게 한 21cm정도 오차 pid_status 변화시키지 않으면 그 안에서 조정 된다.
             percentage = 0
         #if (percentage < 35) and (percentage >-80):
             #self.pid_status = 4
             #print(self.pid_status)
             #return
-        if 10 >percentage> -15 : # 다음으로 넘겨주는 코드
+        if 30 >percentage> -15 : # 다음으로 넘겨주는 코드
             self.before_go = self.go
             self.pid_status = 0# pid 초기화 넣기
 

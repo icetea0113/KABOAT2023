@@ -63,7 +63,7 @@ class MotorControlNode(Node):
         self.angle_pid = PID(10.0/9, 0, 0.05)# 180기준 200
         self.angle_pid.output_limits = (-200, 200) # 출력 범위 제한(임의)
         self.current_angle = None
-        self.target_angle = 90
+        self.target_angle = 0
 
         # 추가, 수정필요
         self.target_angle2 = 0
@@ -74,7 +74,7 @@ class MotorControlNode(Node):
         self.go_pid.output_limits = (-200, 200)
   
 
-        self.pid_status = 2 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid 3 : 직진하면서 각도 각도 제어
+        self.pid_status = 3 # 0 : 목표지정, 1: 각도 pid, 2: 거리 pid 3 : 직진하면서 각도 각도 제어
 
         self.now_heading = 0.0
         #pid 시작할 때 방향과 갯수
@@ -212,11 +212,7 @@ class MotorControlNode(Node):
             left_percentage= 1750 - motor_speed
         print(left_percentage," ",right_percentage)
         current_time = time.time()
-        if (current_time - self.last_time) > 5:
-            throttle.pulse_width = 1500
-            self.set_throttle_handler_left.call_async(throttle)
-            self.set_throttle_handler_right.call_async(throttle)
-            return 0
+
         #left_percentage = 1750
         #right_percentage =1750
              
