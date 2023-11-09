@@ -37,7 +37,7 @@ class MechashipDetect(Node):
         _yolov5_path = (
             self.get_parameter_or(
                 "yolov5_path",
-                Parameter("yolov5_path", Parameter.Type.STRING, "/home/isvlab/yolov5"),
+                Parameter("yolov5_path", Parameter.Type.STRING, "/home/icetea0113/yolov5"),
             )
             .get_parameter_value()
             .string_value

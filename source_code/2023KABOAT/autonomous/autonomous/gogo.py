@@ -83,10 +83,9 @@ class Autonomous(Node):
         
         self.first_gps = (-1,-1)
         self.s_start = ''
-        self.goal_gps = []
+        self.goal_gps = [(35.06937904285, 128.57892811844), (35.0695108102, 128.5789437140), (35.0696434834, 128.57883167254)]
         # self.s_goals = ['x41y70','x29y70','x29y45','x41y4',self.s_start]
-        self.s_goals = ['x4y24','x4y4']
-        self.s_goal = ''
+        self.s_goals = []
         self.init_state = False
         super().__init__(
             "autonomous",
@@ -109,14 +108,15 @@ class Autonomous(Node):
             if self.angle == -10000:
                 self.angle = math.atan2(n,e)
             e, n = self.get_xy(e, n, self.angle)
-            self.stadium_enu.append([n, e])
+            self.stadium_enu.append([np.floor(n), np.floor(e)])
         print("stadium enu values : ", end=' ')
         print(self.stadium_enu)
         
         for value in self.goal_gps:
             e, n, _ = pm.geodetic2enu(value[0], value[1], 0, self.stadium_gps[0][0], self.stadium_gps[0][1], 0)
             e, n = self.get_xy(e, n, self.angle)
-            self.s_goals.append("x"+str(n)+"y"+str(e))
+            print(int(np.floor(n)))
+            self.s_goals.append("x"+str(int(np.floor(n)))+"y"+str(int(np.floor(e))))
     
         self.now_position = ""
         # subscriber 선언
@@ -163,9 +163,7 @@ class Autonomous(Node):
                 abs_float_y = -rel_x*math.sin(self.now_heading_rad) + rel_y*math.cos(self.now_heading_rad) + now_position_enu[1]
                 abs_x = int(np.floor(abs_float_x))
                 abs_y = int(np.floor(abs_float_y))
-                print(abs_x, abs_y
                 if (0 <= abs_x < 76 and 0 <= abs_y < 76) and (abs_x != now_position_enu[0] or abs_y != now_position_enu[1]):
-                and ((abs_float_x - abs_x) > 0.5 or (abs_float_x - abs_y > 0.5))):
                     self.obstacle.append([abs_x, abs_y])
                     #self.obstacle.append([abs_x + 1, abs_y])
                     #self.obstacle.append([abs_x, abs_y + 1])
@@ -180,16 +178,22 @@ class Autonomous(Node):
             
         
     def image_detect_callback(self, data):
-        if len(self.goal_coords) != 3:
+        now_enu= self.stateNameTocoords(self.now_position)
+        if len(self.goal_coords) != 2:
             return
         else:
             if data == 1:
-               now_enu= stateNameTocoords(self.now_position)
-              self.graph[now_enu[1]-4][0] = -1
+                for i in range(3):
+                    self.graph[now_enu[1]-8][20-i] = -1
+                    self.graph[now_enu[1]-8][17-i] = -1
             elif data == 2:
-                pass
+                for i in range(3):
+                    self.graph[now_enu[1]-8][20-i] = -1
+                    self.graph[now_enu[1]-8][14-i] = -1
             elif data == 3:
-                pass
+                for i in range(3):
+                    self.graph[now_enu[1]-8][17-i] = -1
+                    self.graph[now_enu[1]-8][14-i] = -1
         
     def get_xy(self, e, n,angle):
         x = e * math.cos(angle) + n * math.sin(angle) + self.stadium_enu[0][1]
@@ -256,17 +260,17 @@ class Autonomous(Node):
 
     def dstarlite(self):
         global X_DIM, Y_DIM, done
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                # Change the x/y screen coordinates to grid coordinates
-                column = pos[0] // (WIDTH + MARGIN)
-                row = pos[1] // (HEIGHT + MARGIN)
-                # Set that location to one
-                if(self.graph.cells[row][column] in [0,2,3]):
-                    print(row, column)
-                    print("obstacle's coordinate! : " + str(column) +", " + str(row))
-                    self.obstacle.append((column,row))
+        # for event in pygame.event.get():
+        #     if event.type == pygame.MOUSEBUTTONDOWN:
+        #         pos = pygame.mouse.get_pos()
+        #         # Change the x/y screen coordinates to grid coordinates
+        #         column = pos[0] // (WIDTH + MARGIN)
+        #         row = pos[1] // (HEIGHT + MARGIN)
+        #         # Set that location to one
+        #         if(self.graph.cells[row][column] in [0,2,3]):
+        #             print(row, column)
+        #             print("obstacle's coordinate! : " + str(column) +", " + str(row))
+        #             self.obstacle.append((column,row))
 
         if self.s_current != self.now_position:
             self.path, self.s_new, self.k_m = moveAndRescan(self.graph, self.queue, self.s_current, VIEWING_RANGE, self.k_m)
@@ -299,9 +303,10 @@ class Autonomous(Node):
             self.pos_coords = stateNameToCoords(self.s_current)
             self.graph.pos_coords = self.pos_coords
             self.graph, self.queue, self.k_m = initDStarLite(self.graph, self.queue, self.s_current, self.s_goal, self.k_m)
-            while(time.time() - goal_in_time < 3):
-                print(time.time() - goal_in_time)
-                pass
+            if len(self.goal_coords) < 2:
+                while(time.time() - goal_in_time < 3):
+                    print(time.time() - goal_in_time)
+                    pass
         else:
             led_color = RGBColor.Request()
             led_color.red = 255
@@ -314,7 +319,7 @@ class Autonomous(Node):
             self.pos_coords = stateNameToCoords(self.s_current)
             self.graph.pos_coords = self.pos_coords
             # print('got pos coords: ', pos_coords)
-        render_all(self.graph)
+        # render_all(self.graph)
 
 
 def main(args=None):

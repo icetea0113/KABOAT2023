@@ -85,7 +85,7 @@ class Autonomous(Node):
         self.s_start = ''
         self.goal_gps = []
         # self.s_goals = ['x41y70','x29y70','x29y45','x41y4',self.s_start]
-        self.s_goals = ['x3y24','x3y3']
+        self.s_goals = ['x4y24','x4y4']
         self.s_goal = ''
         self.init_state = False
         super().__init__(
@@ -99,7 +99,9 @@ class Autonomous(Node):
             depth=1,
         )
         # PNU Coordinate.
-        self.stadium_gps = [(35.23230278, 129.079367),(35.2321907, 129.0792946),(35.2321735,129.0793515), (35.2322822, 129.0794191)]
+       # self.stadium_gps = [(35.23230278, 129.079367),(35.2321907, 129.0792946),(35.2321735,129.0793515), (35.2322822, 129.0794191)]
+       # self.stadium_gps = [(35.0696588, 128.5788018),(35.0693591, 128.5789238), (35.0693874, 129.57902290), (35.0696865, 128.57890280)]
+        self.stadium_gps = [(35.0695989, 128.5786773),(35.0692921,128.578877),(35.0693113, 128.5789217),(35.0696177, 128.5787222)]
         self.stadium_enu = [[0, 0]]
         self.angle = -10000
         for value in self.stadium_gps[1:]:
@@ -107,14 +109,14 @@ class Autonomous(Node):
             if self.angle == -10000:
                 self.angle = math.atan2(n,e)
             e, n = self.get_xy(e, n, self.angle)
-            self.stadium_enu.append([e, n])
+            self.stadium_enu.append([n, e])
         
         for value in self.goal_gps:
             e, n, _ = pm.geodetic2enu(value[0], value[1], 0, self.stadium_gps[0][0], self.stadium_gps[0][1], 0)
             e, n = self.get_xy(e, n, self.angle)
-            self.s_goals.append("x"+str(e)+"y"+str(n))
+            self.s_goals.append("x"+str(n)+"y"+str(e))
     
-        self.now_position = ""
+        self.now_position = "x30y30"
         # subscriber 선언
         self.gps_subscription = self.create_subscription(NavSatFix, "/fix", self.gps_listener_callback, qos_profile)
         self.yaw_subcription = self.create_subscription(RelHeading, "/rel_yaw", self.heading_listener_callback, qos_profile)
@@ -151,8 +153,8 @@ class Autonomous(Node):
         for scan_data in data.ranges:
             angle += data.angle_increment
             if (scan_data != 0) and (not math.isinf(scan_data)) and (scan_data <= 10):
-                rel_x = scan_data*math.cos(angle)/GRID_INTERVAL
-                rel_y = scan_data*math.sin(angle)/GRID_INTERVAL
+                rel_x = -scan_data*math.cos(-angle)/GRID_INTERVAL
+                rel_y = -scan_data*math.sin(-angle)/GRID_INTERVAL
                 #print("len :" + str(scan_data) + ", angle: " + str(angle)+ ", rel_x : " + str(rel_x) + ", rel_y : " + str(rel_y))
                 now_position_enu = stateNameToCoords(self.now_position)
                 abs_float_x = rel_x*math.cos(self.now_heading_rad) + rel_y*math.sin(self.now_heading_rad) + now_position_enu[0]
@@ -160,14 +162,14 @@ class Autonomous(Node):
                 abs_x = int(np.floor(abs_float_x))
                 abs_y = int(np.floor(abs_float_y))
                 #print(abs_x, abs_y)
-                if (0 <= abs_x < 75 and 0 <= abs_y < 75
-                and (abs_x != now_position_enu[0] or abs_y != now_position_enu[1])
-                and ((abs_float_x - abs_x) > 0.5 or (abs_float_x - abs_y > 0.5))):
+                if (0 <= abs_x < 75 and 0 <= abs_y < 75) and (abs_x != now_position_enu[0] or abs_y != now_position_enu[1]) :
+                #and ((rel_x - np.floor(rel_x)) > 0.5 or (rel_y - np.floor > 0.5)):
+                    #((abs_float_x - abs_x) > 0.5 or (abs_float_x - abs_y > 0.5)):
                     self.obstacle.append([abs_x, abs_y])
-                    self.obstacle.append([abs_x + 1, abs_y])
-                    self.obstacle.append([abs_x, abs_y + 1])
-                    self.obstacle.append([abs_x - 1, abs_y])
-                    self.obstacle.append([abs_x, abs_y - 1])
+                    # self.obstacle.append([abs_x + 1, abs_y])
+                    # self.obstacle.append([abs_x, abs_y + 1])
+                    # self.obstacle.append([abs_x - 1, abs_y])
+                    # self.obstacle.append([abs_x, abs_y - 1])
                     # 대각선
                     # self.obstacle.append([abs_x + 1, abs_y + 1])
                     # self.obstacle.append([abs_x + 1, abs_y - 1])
@@ -193,23 +195,22 @@ class Autonomous(Node):
         return x,y
         
     def gps_listener_callback(self, data):
-        if self.first_gps == (-1,-1):
-            self.first_gps = (data.latitude, data.longtitude)
-        self.now_gps = (data.latitude, data.longitude)
-        #self.now_gps = (35.2322266999725, 129.0793471249975)
+        print("gps in")
+        self.now_gps = (35.069455000000005, 128.57879955)
         now_e, now_n, _ = pm.geodetic2enu(self.now_gps[0], self.now_gps[1], 0, self.stadium_gps[0][0], self.stadium_gps[0][1], 0)
         now_e, now_n = self.get_xy(now_e, now_n, self.angle)
-        now_enu = [now_e, now_n]
+        now_enu = [now_n+2, now_e+3]
             ### 회전변환 코드 짜서 직사각형 좌표계 만들기~
-        
-        self.e_index = int(np.floor(now_e*2))
-        self.n_index = int(np.floor(now_n*2))
-        
+        self.e_index = (int(np.floor(now_e*2)))
+        self.n_index = (int(np.floor(now_n*2)))
+        if self.first_gps == (-1,-1):
+            self.first_gps = (self.n_index, self.e_index)
         self.msg_queue.curr_x = self.e_index
         self.msg_queue.curr_y = self.n_index
         
-        self.now_position = "x"+ str(self.e_index) + "y" + str(self.n_index)
-        # self.now_position = "x30y30"
+        self.now_position = "x"+ str(self.n_index) + "y" + str(self.e_index)
+        self.now_position = "x30y30"
+        print("now!: " + self.now_position)
         if self.init_state == False:
             self.init_function()
             self.init_state = True
@@ -219,16 +220,9 @@ class Autonomous(Node):
         led_color = RGBColor.Request()
         led_color.red = 255
         led_color.green = 255
-        self.let_service.call_async(led_color)
+        self.led_service.call_async(led_color)
         global VIEWING_RANGE
-
-        for i in range(75):
-            self.obstacle.append((1,i))
-            self.obstacle.append((15,i))
-            # self.obstacle.append((2,i))
-            # self.obstacle.append((72,i))
-
-        self.s_start = "x" + str(self.first_gps[0]) + "y" + str(self.first_gps[1])
+        self.s_start = self.now_position
         self.s_goal = self.s_goals[0]
         self.graph.goal = self.s_goal
         self.goal_coords = stateNameToCoords(self.s_goal)
@@ -245,8 +239,12 @@ class Autonomous(Node):
         for item in self.obstacle:
             self.graph.cells[item[1]][item[0]] = -1
         self.path, self.s_new, self.k_m = moveAndRescan(self.graph, self.queue, self.s_current, VIEWING_RANGE, self.k_m)
+        self.msg_queue.list_load = self.path
+        self.queue_publish.publish(self.msg_queue)
+
 
     def dstarlite(self):
+        print(self.now_position)
         global X_DIM, Y_DIM, done
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -280,7 +278,7 @@ class Autonomous(Node):
             led_color.red = 255
             led_color.green = 255
             led_color.blue = 255
-            self.let_service.call_async(led_color)
+            self.led_service.call_async(led_color)
 
             if len(self.s_goals) == 0:
             #     self.graph.cells[item[0]][item[1]] = -1

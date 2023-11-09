@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.parameter import Parameter
-from mechaship_interfaces.srv import  RGBColor
+from mechaship_interfaces.srv import RGBColor
 
 class Greenlight(Node):
     def __init__(self):
@@ -11,7 +11,7 @@ class Greenlight(Node):
             allow_undeclared_parameters=True,
             automatically_declare_parameters_from_overrides=True,
         )
-        self.set_color_handler = self.create_client(RGBColor, "set_color")
+        self.set_color_handler = self.create_client(RGBColor, "rgbled/set")
         self.light()
 
     def light(self):
@@ -24,16 +24,9 @@ class Greenlight(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = Greenlight()
-    try:
-        rclpy.spin(node)
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
-    except KeyboardInterrupt:
-        node.get_logger().info("Keyboard Interrupt (SIGINT)")
-
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
